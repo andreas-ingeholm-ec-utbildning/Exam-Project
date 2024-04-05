@@ -7,3 +7,4 @@ This project uses the following:
 * asp.net
 * htmx
 * Tailwind 
+* Font awesome
