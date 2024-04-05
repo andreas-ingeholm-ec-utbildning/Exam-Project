@@ -1,0 +1,36 @@
+﻿<header class="flex h-20">
+    <!--Logo-->
+    <a class="navbar-brand flex my-auto mx-3 flex-shrink-0" href="#">
+        <img src="https://img.icons8.com/dotty/42/FFFFFF/play.png" alt="app-icon" class="m-auto me-3"/>
+        <b class="my-auto pb-1.5">Youtube clone</b>
+    </a>
+
+    <!--Searchbar: large viewport-->
+    <div class="max-[335px]:hidden ms-auto my-auto flex-shrink min-w-0 me-3">
+        @await Html.PartialAsync("_searchbox")
+    </div>
+
+    <!--Searchbar: small viewport-->
+    <details class="min-[336px]:hidden flex-shrink-0 ms-auto me-3 my-auto">
+        <!-- Button to be visible -->
+        <summary class="rounded-full w-12 h-12 bg-neutral-800 hover:bg-neutral-200 flex cursor-pointer">
+            <img src="https://img.icons8.com/ios/22/FFFFFF/search--v1.png" alt="search-icon" class="m-auto" />
+        </summary>
+
+        <!-- Content will be hidden until the user clicks on the summary button. -->
+        <div class="mx-3 h-12 left-0 right-0 top-16 my-2 absolute inset-0 text-gray-600">
+            @await Html.PartialAsync("_searchbox")
+        </div>
+    </details>
+
+    <script>
+        var details = [...document.querySelectorAll('details')];
+        document.addEventListener('click', function (e) {
+            if (!details.some(f => f.contains(e.target))) {
+                details.forEach(f => f.removeAttribute('open'));
+            } else {
+                details.forEach(f => !f.contains(e.target) ? f.removeAttribute('open') : '');
+            }
+        })
+    </script>
+</header>
