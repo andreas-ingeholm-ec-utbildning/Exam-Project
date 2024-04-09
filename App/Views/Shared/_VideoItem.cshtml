@@ -1,0 +1,25 @@
+﻿@model Video
+
+<div>
+    <a href="@Model.WatchUrl">
+        <img src="@Model.ImageUrl" height="256">
+
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <img src="@Model.User?.ImageUrl" class="rounded-full" width="48">
+                </div>
+
+                <div class="col">
+                    <h2 class="text-gray-700">@Model.Title</h2>
+
+                    <a href="@Model.User?.UserUrl">
+                        <h3 class="text-gray-700">@Model.User?.Name</h3>
+                    </a>
+
+                    <h3 class="text-gray-700">@Model.UploadDate</h3>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>

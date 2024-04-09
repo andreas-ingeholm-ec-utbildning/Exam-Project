@@ -1,8 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Home";
-}
+﻿<div id="list" class="flex flex-wrap">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<button hx-get="/videos/search?q=test"
+        hx-target="#list">
+    Load items...
+</button>
