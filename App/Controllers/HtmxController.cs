@@ -20,20 +20,8 @@ public class HtmxController : Controller
 
     public class HtmlResult(Controller controller) : ContentResult
     {
+
         readonly List<(string partialName, object? model)> partials = [];
-
-        public override async Task ExecuteResultAsync(ActionContext context)
-        {
-            var response = context.HttpContext.Response;
-            response.Headers["ContentType"] = "text/html";
-            var sb = new StringBuilder();
-            foreach (var (partialName, model) in partials)
-                sb.AppendLine(await RenderViewToStringAsync(partialName, model));
-
-            using var sw = new StreamWriter(response.Body, Encoding.UTF8);
-            await sw.WriteAsync(sb.ToString());
-            await sw.DisposeAsync();
-        }
 
         /// <summary>Renders the partial as html and adds it to the response.</summary>
         public HtmlResult AddPartial<T>(string name)
@@ -55,6 +43,23 @@ public class HtmxController : Controller
             return this;
         }
 
+        public override async Task ExecuteResultAsync(ActionContext context)
+        {
+
+            //Render the partials added using AddPartial methods, and write it as response to client
+
+            var response = context.HttpContext.Response;
+            response.Headers["ContentType"] = "text/html";
+            var sb = new StringBuilder();
+            foreach (var (partialName, model) in partials)
+                sb.AppendLine(await RenderViewToStringAsync(partialName, model));
+
+            using var sw = new StreamWriter(response.Body, Encoding.UTF8);
+            await sw.WriteAsync(sb.ToString());
+            await sw.DisposeAsync(); //Must dispose manually, asp.net throws otherwise
+
+        }
+
         //Taken, with modifications, from https://stackoverflow.com/a/65462120/24282772
         async Task<string> RenderViewToStringAsync(string viewNamePath, object? model = null)
         {
@@ -65,19 +70,12 @@ public class HtmxController : Controller
 
             using var writer = new StringWriter();
 
-            try
-            {
-                var view = FindView(viewNamePath);
-                var viewContext = new ViewContext(controller.ControllerContext, view, controller.ViewData, controller.TempData, writer, new HtmlHelperOptions());
+            var view = FindView(viewNamePath);
+            var viewContext = new ViewContext(controller.ControllerContext, view, controller.ViewData, controller.TempData, writer, new HtmlHelperOptions());
 
-                await view.RenderAsync(viewContext);
+            await view.RenderAsync(viewContext);
 
-                return writer.GetStringBuilder().ToString();
-            }
-            catch (Exception ex)
-            {
-                return $"Failed - {ex.Message}";
-            }
+            return writer.GetStringBuilder().ToString();
         }
 
         IView FindView(string viewNamePath)
