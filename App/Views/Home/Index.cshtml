@@ -1,8 +1,8 @@
-﻿<div id="list" class="flex flex-wrap">
-
+﻿<div class="absolute left-0 right-0 flex">
+    <div id="@KnownNames.ProgressSpinner" class="htmx-indicator spinner-border mx-auto my-5" role="status"></div>
 </div>
 
-<button hx-get="/videos/search?q=test"
-        hx-target="#list">
-    Load items...
-</button>
+<div id="list" class="mx-auto mb-1 gap-6 grid grid-cols-1 sm:grid-cols-2 m:grid-cols-3 xl:grid-cols-4 justify-items-center"></div>
+
+<!--Trigger initial load-->
+<div hx-get="/videos/feed" hx-target="@KnownNames.ListID" hx-trigger="load" hx-indicator="@KnownNames.ProgressSpinnerID"></div>

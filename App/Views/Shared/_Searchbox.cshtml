@@ -1,9 +1,29 @@
-﻿<form method="get" class="flex flex-shrink min-w-0" asp-controller="videos" asp-action="search">
+﻿<form id="form" method="get" class="flex flex-shrink min-w-0"
+      hx-get="/videos/search" hx-target="@KnownNames.ListID" hx-indicator="@KnownNames.ProgressSpinnerID">
     <div class="bg-neutral-800 rounded-xl w-full my-auto relative h-12 flex-shrink min-w-0 flex">
-        <input type="search" id="q" name="q" class="h-12 bg-transparent focus:outline-none flex-shrink flex-grow ms-4 me-12 my-auto min-w-0" placeholder="Search..."
-               required>
+        <input type="text" id="q" name="q" class="h-12 bg-transparent focus:outline-none flex-shrink flex-grow ms-4 me-12 my-auto min-w-0" placeholder="Search..."
+               onkeypress="onInputChange()" onkeydown="onInputChange()">
+
+        <script>
+            onInputChange();
+            function onInputChange() {
+                setTimeout(() => {
+                    //Display button when input has value
+                    let button = document.getElementById('reset');
+                    let input = document.getElementById('q');
+                    button.classList.toggle("hidden", input.value === '');
+                }, 1);
+            }
+        </script>
+
+        <button id="reset" type="reset" class="absolute right-14 top-0 bottom-0 hover:bg-neutral-200 w-12 hidden"
+                hx-get="/videos/feed" hx-target="@KnownNames.ListID" hx-indicator="@KnownNames.ProgressSpinnerID"
+                hx-on:click="document.getElementById('q').value = '';  document.getElementById('reset').classList.add('hidden');">
+            <i class="fa-solid fa-xmark m-auto"></i>
+        </button>
+
         <button type="submit" class="rounded-r-xl w-12 hover:bg-neutral-200 flex absolute right-0 top-0 bottom-0">
-            <img src="https://img.icons8.com/ios/22/FFFFFF/search--v1.png" alt="search-icon" class="m-auto" />
+            <i class="fa-solid fa-magnifying-glass m-auto"></i>
         </button>
     </div>
 </form>

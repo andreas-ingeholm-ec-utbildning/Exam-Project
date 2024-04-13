@@ -3,7 +3,7 @@ using App.DB;
 using App.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Controllers;
+namespace App.Services;
 
 public class EntityService<T>(UserContext userContext) where T : Entity
 {
