@@ -1,18 +1,26 @@
 ﻿using App.Models;
+using App.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers;
 
-public class VideosController : HtmxController
+public enum FeedKind
 {
-    public IActionResult Search([FromQuery] string? q)
+    Video, User
+}
+
+public class FeedController : HtmxController
+{
+    [Route(Endpoints.Feed.Search)]
+    public IActionResult Search([FromQuery] string? q, [FromQuery] FeedKind kind = FeedKind.Video)
     {
         var videos = Enumerable.Range(1, 50).Select(GetVideo);
         videos = videos.Where(v => v.Title.Contains(q ?? string.Empty, StringComparison.InvariantCultureIgnoreCase));
         return Html().AddPartials("_VideoItem", videos.ToArray());
     }
 
-    public IActionResult Feed()
+    [Route(Endpoints.Feed.Recommendations)]
+    public IActionResult Recommended([FromQuery] FeedKind kind = FeedKind.Video)
     {
         var videos = Enumerable.Range(1, 50).Select(GetVideo);
         return Html().AddPartials("_VideoItem", videos.ToArray());
@@ -29,6 +37,17 @@ public class VideosController : HtmxController
             UploadDate = DateTime.Now,
             WatchUrl = "/watch/test" + count,
         };
+    }
+
+}
+
+public class VideoController : HtmxController
+{
+
+    [Route("/video/{id?}")]
+    public IActionResult Index(string id)
+    {
+        return Html().AddPartial("_VideoView");
     }
 
 }

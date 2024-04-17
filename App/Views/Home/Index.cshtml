@@ -1,8 +1,13 @@
-﻿<div class="absolute left-0 right-0 flex">
-    <div id="@KnownNames.ProgressSpinner" class="htmx-indicator spinner-border mx-auto my-5" role="status"></div>
+﻿<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner">
+
+    <!--Trigger initial load-->
+    <div hx-get="@Endpoints.Feed.VideoRecommendations" hx-target="#@KnownNames.ContentView" hx-trigger="load"></div>
+
+    @await Html.PartialAsync("_Header")
+    @await Html.PartialAsync("_sidebar")
+
+    <div class="absolute left-16 right-0 top-20 bottom-0">
+        <div id="@KnownNames.ContentView" class="h-full w-full"></div>
+        <div id="@KnownNames.ProgressSpinner" class="absolute left-0 right-0 top-0 bottom-0 htmx-indicator spinner-border mx-auto my-5 transition-opacity" role="status"></div>
+    </div>
 </div>
-
-<div id="list" class="mx-auto mb-1 gap-6 grid grid-cols-1 sm:grid-cols-2 m:grid-cols-3 xl:grid-cols-4 justify-items-center"></div>
-
-<!--Trigger initial load-->
-<div hx-get="/videos/feed" hx-target="@KnownNames.ListID" hx-trigger="load" hx-indicator="@KnownNames.ProgressSpinnerID"></div>

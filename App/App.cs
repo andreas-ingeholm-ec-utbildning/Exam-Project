@@ -1,4 +1,17 @@
-//TODO: Change icons to font awesome
+//TODO: Make 'overlays', feed view (home + search), user view, watch view
+
+//TODO: Videos
+//TODO: Use https://github.com/mudler/LocalAI to sort items, to make an 'algorithm'
+
+//TODO: Users
+//TODO: Implement users
+//TODO: Implement create / login
+//TODO: Implement user page
+
+//TODO: Feed view
+//TODO: 
+
+//TODO: Make uris more user friendly (/user/<id of user>), but make it as a translation layer client side
 
 using Htmx.TagHelpers;
 

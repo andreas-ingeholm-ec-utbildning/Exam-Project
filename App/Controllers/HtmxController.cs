@@ -24,7 +24,7 @@ public class HtmxController : Controller
         readonly List<(string partialName, object? model)> partials = [];
 
         /// <summary>Renders the partial as html and adds it to the response.</summary>
-        public HtmlResult AddPartial<T>(string name)
+        public HtmlResult AddPartial(string name)
         {
             partials.Add((name, null));
             return this;
