@@ -1,12 +1,12 @@
-﻿<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner">
-
-    <!--Trigger initial load-->
-    <div hx-get="@Endpoints.Feed.VideoRecommendations" hx-target="#@KnownNames.ContentView" hx-trigger="load"></div>
+﻿<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner" hx-boost="true">
 
     @await Html.PartialAsync("_Header")
     @await Html.PartialAsync("_sidebar")
 
-    <div class="absolute left-16 right-0 top-20 bottom-0">
+    <!--Trigger initial load-->
+    <init hx-get="@Endpoints.Feed.VideoRecommendations" hx-trigger="load"></init>
+
+    <div class="absolute left-20 top-20 right-0 bottom-0">
         <div id="@KnownNames.ContentView" class="h-full w-full"></div>
         <div id="@KnownNames.ProgressSpinner" class="absolute left-0 right-0 top-0 bottom-0 htmx-indicator spinner-border mx-auto my-5 transition-opacity" role="status"></div>
     </div>
