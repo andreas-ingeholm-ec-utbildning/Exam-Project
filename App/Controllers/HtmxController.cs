@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -45,19 +46,18 @@ public class HtmxController : Controller
 
         public override async Task ExecuteResultAsync(ActionContext context)
         {
-
             //Render the partials added using AddPartial methods, and write it as response to client
 
             var response = context.HttpContext.Response;
             response.Headers["ContentType"] = "text/html";
             var sb = new StringBuilder();
+
             foreach (var (partialName, model) in partials)
                 sb.AppendLine(await RenderViewToStringAsync(partialName, model));
 
             using var sw = new StreamWriter(response.Body, Encoding.UTF8);
-            await sw.WriteAsync(sb.ToString());
+            await sw.WriteAsync(sb.ToString().RemoveWhitespace());
             await sw.DisposeAsync(); //Must dispose manually, asp.net throws otherwise
-
         }
 
         //Taken, with modifications, from https://stackoverflow.com/a/65462120/24282772
@@ -75,7 +75,8 @@ public class HtmxController : Controller
 
             await view.RenderAsync(viewContext);
 
-            return writer.GetStringBuilder().ToString();
+            var s = writer.GetStringBuilder().ToString().Trim();
+            return s;
         }
 
         IView FindView(string viewNamePath)

@@ -10,7 +10,7 @@
 
     <!--Searchbar: large viewport-->
     <div class="max-[335px]:hidden ms-auto my-auto flex-shrink min-w-0 me-3">
-        @await Html.PartialAsync("_searchbox")
+        @await Html.PartialAsync(Partials.Page.SearchBar)
     </div>
 
     <!--Searchbar: small viewport-->
@@ -22,7 +22,7 @@
 
         <!-- Content will be hidden until the user clicks on the summary button. -->
         <div class="mx-3 h-12 left-0 right-0 top-16 my-2 absolute inset-0 text-gray-600">
-            @await Html.PartialAsync("_searchbox")
+            @await Html.PartialAsync(Partials.Page.SearchBar)
         </div>
     </details>
 

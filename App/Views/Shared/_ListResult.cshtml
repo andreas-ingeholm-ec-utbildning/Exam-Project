@@ -1,8 +1,0 @@
-﻿@model ListResultViewModel
-
-@{
-    foreach ((string name, object viewModel) in Model.Partials)
-    {
-        await Html.PartialAsync(name, viewModel);
-    }
-}
