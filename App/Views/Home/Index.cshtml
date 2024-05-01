@@ -1,11 +1,13 @@
-﻿<!--Set defaults for htmx, inherited by descendants-->
-<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner" hx-boost="true">
+﻿@model HomeViewModel;
+
+<!--Set defaults for htmx, inherited by descendants-->
+<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner" hx-boost="true" hx-replace-url="true" hx-location="">
 
     @await Html.PartialAsync(Partials.Page.Header)
     @await Html.PartialAsync(Partials.Page.Sidebar)
 
     <!--Trigger initial load-->
-    <init hx-get="@Endpoints.Feed.VideoRecommendations" hx-trigger="load"></init>
+    <init hx-get="@Model.InitialRequestUrl" hx-trigger="load"></init>
 
     <!--Content view-->
     <div class="absolute left-20 top-20 right-0 bottom-0">

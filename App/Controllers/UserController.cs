@@ -1,4 +1,5 @@
-﻿using App.Models.Entities;
+﻿using App.Models;
+using App.Models.Entities;
 using App.Models.ViewModels;
 using App.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,9 @@ public class UserController(EntityService<UserEntity> userService) : HtmxControl
     [HttpGet(Endpoints.User.Me)]
     public IActionResult Me()
     {
+        if (Request.Headers["hx-request"] != "true")
+            return View("~/Views/Home/Index.cshtml", new HomeViewModel(Request.Path));
+
         if (User.Identity?.IsAuthenticated ?? false)
             return Html().AddPartial(Partials.Views.User);
         else
@@ -20,6 +24,9 @@ public class UserController(EntityService<UserEntity> userService) : HtmxControl
     [HttpGet(Endpoints.User.Login)]
     public IActionResult Login()
     {
+        if (Request.Headers["hx-request"] != "true")
+            return View("~/Views/Home/Index.cshtml", new HomeViewModel(Request.Path));
+
         return Html().AddPartial(Partials.Views.LoginUser);
     }
 
@@ -32,6 +39,9 @@ public class UserController(EntityService<UserEntity> userService) : HtmxControl
     [HttpGet(Endpoints.User.Create)]
     public IActionResult Create()
     {
+        if (Request.Headers["hx-request"] != "true")
+            return View("~/Views/Home/Index.cshtml", new HomeViewModel(Request.Path));
+
         return Html().AddPartial(Partials.Views.CreateUser);
     }
 

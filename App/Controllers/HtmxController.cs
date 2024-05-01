@@ -9,15 +9,16 @@ namespace App.Controllers;
 
 public class HtmxController : Controller
 {
-
     /// <summary>Returns <paramref name="html"/> as response.</summary>
     public IActionResult Html(string html) =>
         new ContentResult() { Content = html };
 
     /// <summary>Returns html content as response.</summary>
     /// <remarks>See <see cref="HtmlResult.AddPartial{T}(string)"/>.</remarks>
-    public HtmlResult Html() =>
-        new(this);
+    public HtmlResult Html()
+    {
+        return new(this);
+    }
 
     public class HtmlResult(Controller controller) : ContentResult
     {
