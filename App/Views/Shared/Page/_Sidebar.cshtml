@@ -6,7 +6,8 @@
         <p class="my-auto m-4 text-transparent group-hover:text-white transition-colors">Browse</p>
     </button>
 
-    <button class="group hover:bg-neutral-600 rounded-xl ms-2 mb-2 w-64 h-16 flex transition-colors">
+    <button class="group hover:bg-neutral-600 rounded-xl ms-2 mb-2 w-64 h-16 flex transition-colors"
+            hx-get="@Endpoints.User.Me">
         <i class="fa-solid fa-user text-white my-auto m-4"></i>
         <p class="my-auto m-4 text-transparent group-hover:text-white transition-colors">Your account</p>
     </button>

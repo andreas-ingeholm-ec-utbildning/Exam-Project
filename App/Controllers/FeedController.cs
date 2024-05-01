@@ -41,14 +41,3 @@ public class FeedController : HtmxController
     }
 
 }
-
-public class VideoController : HtmxController
-{
-
-    [Route("/video/{id?}")]
-    public IActionResult Index(string id)
-    {
-        return Html().AddPartial(Partials.Views.Video);
-    }
-
-}

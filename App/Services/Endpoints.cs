@@ -6,70 +6,90 @@ public static class Endpoints
     {
         //Recommendations
 
-        /// <summary><b>get</b> The endpoint to retrieve a recommended videos feed.</summary>
+        /// <summary>The endpoint to retrieve a recommended videos feed.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string Recommendations = "/feed/recommended";
 
-        /// <summary><b>get</b> The endpoint to retrieve a recommended videos feed.</summary>
+        /// <summary>The endpoint to retrieve a recommended videos feed.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string VideoRecommendations = "/feed/recommended?kind=video";
 
-        /// <summary><b>get</b> The endpoint to retrieve a recommended users feed.</summary>
+        /// <summary>The endpoint to retrieve a recommended users feed.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string UserRecommendations = "/feed/recommended?kind=user";
 
 
         //Search
 
-        /// <summary><b>get</b> The endpoint to retrieve a searched videos feed.</summary>
+        /// <summary>The endpoint to retrieve a searched videos feed.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string Search = "/feed/search";
 
-        /// <summary><b>get</b> The endpoint to retrieve a searched videos feed.</summary>
+        /// <summary>The endpoint to retrieve a searched videos feed.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string VideoSearch = "/feed/search?kind=video";
 
-        /// <summary><b>get</b> The endpoint to retrieve a searched users feed.</summary>
+        /// <summary>The endpoint to retrieve a searched users feed.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string UserSearch = "/feed/search?kind=user";
 
 
         //Comments
 
-        /// <summary><b>get</b> The endpoint to retrieve video comments. <b>Requires videoid query</b>. <b>Requires id query</b>.</summary>
+        /// <summary>The endpoint to retrieve video comments. <b>Requires videoid query</b>. <b>Requires id query</b>.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string Comments = "/feed/comments";
     }
 
     public static class User
     {
-        /// <summary><b>get, (auth) post</b> The endpoint to retrieve user info. <b>Requires id query</b>.</summary>
-        public const string Info = "/user/info";
+        /// <summary>The endpoint to retreive my user view.</summary>
+        /// <remarks><b>get</b></remarks>
+        public const string Me = "/user/me";
 
-        /// <summary><b>get</b> The endpoint to retrieve user videos. <b>Requires id query</b>.</summary>
-        public const string UserVideos = "/user/videos";
-
-        /// <summary><b>(auth) post</b> The endpoint to create user.</summary>
+        public const string Login = "/user/login";
         public const string Create = "/user/create";
 
-        /// <summary><b>(auth) post</b> The endpoint to delete user. <b>Requires id query</b>.</summary>
+        /// <summary>The endpoint to retrieve user info. <b>Requires id query</b>.</summary>
+        /// <remarks><b>get, (auth) post</b></remarks>
+        public const string Info = "/user/info";
+
+        /// <summary>The endpoint to retrieve user videos. <b>Requires id query</b>.</summary>
+        /// <remarks><b>get</b></remarks>
+        public const string UserVideos = "/user/videos";
+
+        /// <summary>The endpoint to delete user. <b>Requires id query</b>.</summary>
+        /// <remarks><b>(auth) post</b></remarks>
         public const string Delete = "/user/delete";
     }
 
     public static class Video
     {
-        /// <summary><b>get</b> The endpoint to retrieve video player. <b>Requires id query</b>.</summary>
+        /// <summary>The endpoint to retrieve video player. <b>Requires id query</b>.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string Player = "/video/";
 
-        /// <summary><b>get</b> The endpoint to retrieve video user. <b>Requires id query</b>.</summary>
+        /// <summary>The endpoint to retrieve video user. <b>Requires id query</b>.</summary>
+        /// <remarks><b>get</b></remarks>
         public const string User = "/video/user";
 
-        /// <summary><b>(auth) put</b> The endpoint to upload / replace video.</summary>
+        /// <summary>The endpoint to upload / replace video.</summary>
+        /// <remarks><b>(auth) put</b></remarks>
         public const string Upload = "/video/upload";
 
-        /// <summary><b>(auth) post</b> The endpoint to delete video. <b>Requires id query</b>.</summary>
+        /// <summary>The endpoint to delete video. <b>Requires id query</b>.</summary>
+        /// <remarks><b>(auth) post</b></remarks>
         public const string Delete = "/video/delete";
     }
 
     public static class Comments
     {
-        /// <summary><b>(auth) put</b> The endpoint to add or update a comment for a video. <b>Requires videoid query</b>. <b>Requires model</b>.</summary>
+        /// <summary>The endpoint to add or update a comment for a video. <b>Requires videoid query</b>. <b>Requires model</b>.</summary>
+        /// <remarks><b>(auth) put</b></remarks>
         public const string PostComment = "/comments";
 
-        /// <summary><b>(auth) post</b> The endpoint to delete a comment for a video. <b>Requires videoid query</b>. <b>Requires id query</b>.</summary>
+        /// <summary>The endpoint to delete a comment for a video. <b>Requires videoid query</b>. <b>Requires id query</b>.</summary>
+        /// <remarks><b>(auth) post</b></remarks>
         public const string DeleteComment = "/comments/delete";
     }
 }

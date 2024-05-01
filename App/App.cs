@@ -13,6 +13,9 @@
 
 //TODO: Make uris more user friendly (/user/<id of user>), but make it as a translation layer client side
 
+using App.DB;
+using App.Models.Entities;
+using App.Services;
 using Htmx.TagHelpers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddTailwindCssTagHelpers(builder.Configuration);
+
+builder.Services.AddTransient<UserContext>();
+builder.Services.AddTransient<EntityService<UserEntity>>();
+builder.Services.AddTransient<EntityService<VideoEntity>>();
 
 var app = builder.Build();
 
