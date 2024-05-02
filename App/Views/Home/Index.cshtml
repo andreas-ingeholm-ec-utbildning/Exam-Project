@@ -1,7 +1,7 @@
 ﻿@model HomeViewModel;
 
 <!--Set defaults for htmx, inherited by descendants-->
-<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner" hx-boost="true" hx-replace-url="true" hx-location="">
+<div hx-target="#@KnownNames.ContentView" hx-indicator="#@KnownNames.ProgressSpinner" hx-boost="true" hx-replace-url="true">
 
     @await Html.PartialAsync(Partials.Page.Header)
     @await Html.PartialAsync(Partials.Page.Sidebar)

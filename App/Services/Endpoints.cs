@@ -49,6 +49,7 @@ public static class Endpoints
 
         public const string Login = "/user/login";
         public const string Create = "/user/create";
+        public const string Bookmarks = "/user/bookmarks";
 
         /// <summary>The endpoint to retrieve user info. <b>Requires id query</b>.</summary>
         /// <remarks><b>get, (auth) post</b></remarks>

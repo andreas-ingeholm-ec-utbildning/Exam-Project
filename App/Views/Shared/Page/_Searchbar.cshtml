@@ -1,24 +1,10 @@
 ﻿<form id="form" method="get" class="flex flex-shrink min-w-0"
       hx-get="@Endpoints.Feed.Search">
     <div class="bg-neutral-800 rounded-xl w-full my-auto relative h-12 flex-shrink min-w-0 flex">
-        <input type="text" id="q" name="q" class="h-12 bg-transparent focus:outline-none flex-shrink flex-grow ms-4 me-12 my-auto min-w-0 text-white" placeholder="Search..."
-               onkeypress="onInputChange()" onkeydown="onInputChange()">
-
-        <script>
-            onInputChange();
-            function onInputChange() {
-                setTimeout(() => {
-                    //Display button when input has value
-                    let button = document.getElementById('reset');
-                    let input = document.getElementById('q');
-                    button.classList.toggle("hidden", input.value === '');
-                }, 1);
-            }
-        </script>
+        <input type="text" id="q" name="q" class="h-12 bg-transparent focus:outline-none flex-shrink flex-grow ms-4 me-12 my-auto min-w-0 text-white" placeholder="Search...">
 
         <button id="reset" type="reset" class="absolute right-14 top-0 bottom-0 hover:bg-neutral-600 w-12 hidden"
-                hx-get="@Endpoints.Feed.Search"
-                hx-on:click="document.getElementById('q').value = ''; document.getElementById('reset').classList.add('hidden');">
+                hx-get="@Endpoints.Feed.Recommendations">
             <i class="fa-solid fa-xmark m-auto text-white"></i>
         </button>
 

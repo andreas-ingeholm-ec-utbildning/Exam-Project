@@ -14,6 +14,7 @@ public static class Partials
         public const string Video = "Views/_Video";
         public const string LoginUser = "Views/_LoginUser";
         public const string CreateUser = "Views/_CreateUser";
+        public const string Bookmarks = "Views/_Bookmarks";
         public const string User = "Views/_User";
     }
 

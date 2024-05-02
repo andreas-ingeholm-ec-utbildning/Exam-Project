@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using App.Models;
+using App.Models.ViewModels;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,15 +15,83 @@ public class HtmxController : Controller
     public IActionResult Html(string html) =>
         new ContentResult() { Content = html };
 
-    /// <summary>Returns html content as response.</summary>
-    /// <remarks>See <see cref="HtmlResult.AddPartial{T}(string)"/>.</remarks>
-    public HtmlResult Html()
+    public IActionResult Partial<T>(string partial, params T[] models)
     {
-        return new(this);
+        return Partial(false, partial, models);
     }
 
-    public class HtmlResult(Controller controller) : ContentResult
+    public IActionResult Partial(string partial)
     {
+        return Partial(false, partial);
+    }
+
+    public virtual void OnHTMLResponse(HtmlResult html)
+    { }
+
+    public IActionResult Partial<T>(bool requireAuth, string partial, params T?[] models)
+    {
+        if (!IsHtmxRequest())
+        {
+            return RedirectToHome(Request.Path + Request.QueryString);
+        }
+        else if (requireAuth && !(User.Identity?.IsAuthenticated ?? false))
+        {
+            return PromptLogin();
+        }
+        else
+        {
+            return new HtmlResult(this).AddPartials(partial, models);
+        }
+    }
+
+    public IActionResult Partial(bool requireAuth, string partial)
+    {
+        if (!IsHtmxRequest())
+        {
+            return RedirectToHome(Request.Path + Request.QueryString);
+        }
+        else if (requireAuth && !(User.Identity?.IsAuthenticated ?? false))
+        {
+            return PromptLogin();
+        }
+        else
+        {
+            return new HtmlResult(this).AddPartial(partial);
+        }
+    }
+
+    HtmlResult PromptLogin()
+    {
+        return new HtmlResult(this).AddPartial(Partials.Views.LoginUser, new LoginOrCreateUserViewModel());
+    }
+
+    bool IsHtmxRequest()
+    {
+        return Request.Headers["hx-request"] == "true";
+    }
+
+    IActionResult RedirectToHome(string requestUrl)
+    {
+        //User navigated to endpoint directly, lets redirect to page proper, then make request once more
+        return View("~/Views/Home/Index.cshtml", new HomeViewModel(requestUrl));
+    }
+
+    public bool IsAuthorized()
+    {
+        return User.Identity?.IsAuthenticated ?? false;
+    }
+
+    public class HtmlResult(HtmxController controller) : ContentResult
+    {
+        #region Title
+
+        string? title;
+
+        public void SetTitle(string title) =>
+            this.title = title;
+
+        #endregion
+        #region Partials
 
         readonly List<(string partialName, object? model)> partials = [];
 
@@ -45,13 +115,20 @@ public class HtmxController : Controller
             return this;
         }
 
+        #endregion
+
         public override async Task ExecuteResultAsync(ActionContext context)
         {
+            controller.OnHTMLResponse(this);
+
             //Render the partials added using AddPartial methods, and write it as response to client
 
             var response = context.HttpContext.Response;
             response.Headers["ContentType"] = "text/html";
             var sb = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(title))
+                sb.AppendLine($"<title>{title}</title>");
 
             foreach (var (partialName, model) in partials)
                 sb.AppendLine(await RenderViewToStringAsync(partialName, model));

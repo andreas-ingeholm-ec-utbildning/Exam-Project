@@ -27,13 +27,53 @@
     </details>
 
     <script>
-        var details = [...document.querySelectorAll('details')];
-        document.addEventListener('click', function (e) {
-            if (!details.some(f => f.contains(e.target))) {
-                details.forEach(f => f.removeAttribute('open'));
-            } else {
-                details.forEach(f => !f.contains(e.target) ? f.removeAttribute('open') : '');
+        initSmallViewport();
+        initSearchbar();
+
+        function initSmallViewport() {
+            var details = [...document.querySelectorAll('details')];
+            document.addEventListener('click', function (e) {
+                if (!details.some(f => f.contains(e.target))) {
+                    details.forEach(f => f.removeAttribute('open'));
+                } else {
+                    details.forEach(f => !f.contains(e.target) ? f.removeAttribute('open') : '');
+                }
+            })
+        }
+
+        function initSearchbar() {
+            let previousUrl = '';
+            const observer = new MutationObserver(function (mutations) {
+                if (location.href !== previousUrl) {
+                    previousUrl = location.href;
+                    onUrlChanged();
+                }
+            });
+            const config = { subtree: true, childList: true };
+            observer.observe(document, config);
+
+            onUrlChanged();
+            function onUrlChanged() {
+                setTimeout(() => {
+                    updateClearButton();
+                    updateSearchQuery();
+                }, 10);
             }
-        })
+
+            function updateClearButton() {
+                let visible = getQuery() !== '';
+                document.querySelectorAll('#reset').forEach(e => {
+                    e.classList.toggle("hidden", !visible);
+                });
+            }
+            function updateSearchQuery() {
+                document.querySelectorAll('#q').forEach(e => {
+                    e.value = getQuery();
+                });
+            }
+            function getQuery() {
+                return new URLSearchParams(window.location.search).get('q');
+            }
+        }
     </script>
 </header>

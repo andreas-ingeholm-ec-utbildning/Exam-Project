@@ -27,7 +27,18 @@ builder.Services.AddTailwindCssTagHelpers(builder.Configuration);
 builder.Services.AddTransient<UserContext>();
 builder.Services.AddTransient<EntityService<UserEntity>>();
 builder.Services.AddTransient<EntityService<VideoEntity>>();
-
+builder.Services.AddCors(options =>
+     {
+         options.AddPolicy("AllowAll",
+             builder =>
+             {
+                 builder
+                 .AllowAnyOrigin()
+                 .AllowAnyMethod()
+                 .AllowAnyHeader()
+                 .AllowCredentials();
+             });
+     });
 var app = builder.Build();
 
 app.UseExceptionHandler("/Shared/Error");

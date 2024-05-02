@@ -12,11 +12,6 @@ public class HomeController : Controller
         return View(new HomeViewModel(initialRequestUrl: Endpoints.Feed.VideoRecommendations));
     }
 
-    public IActionResult Index2(HomeViewModel viewModel)
-    {
-        return View(viewModel);
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
