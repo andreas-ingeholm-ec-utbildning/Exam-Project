@@ -26,8 +26,11 @@ public class FeedController : HtmxController
     }
 
     [Route(Endpoints.Feed.Search)]
-    public IActionResult Search([FromQuery] string q, [FromQuery] FeedKind kind = FeedKind.Video)
+    public IActionResult Search([FromQuery] string? q = null, [FromQuery] FeedKind kind = FeedKind.Video)
     {
+        if (string.IsNullOrEmpty(q))
+            return Recommended(kind);
+
         return
             kind == FeedKind.Video
             ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).Search(q, v => v.Title).ToArray())

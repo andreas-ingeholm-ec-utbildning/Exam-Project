@@ -849,14 +849,6 @@ video {
   margin-top: 1.25rem;
 }
 
-.ms-3 {
-  margin-inline-start: 0.75rem;
-}
-
-.ms-3\.5 {
-  margin-inline-start: 0.875rem;
-}
-
 .box-border {
   box-sizing: border-box;
 }

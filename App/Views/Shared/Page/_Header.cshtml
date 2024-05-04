@@ -1,4 +1,5 @@
-﻿<div class="h-20"></div>
+﻿<!--Offset content, since header is fixed-->
+<div class="h-20"></div>
 
 <header class="flex h-20 fixed top-0 left-0 right-0 bg-neutral-900/100 z-10">
     <!--Logo-->
@@ -9,71 +10,63 @@
     </button>
 
     <!--Searchbar: large viewport-->
-    <div class="max-[335px]:hidden ms-auto my-auto flex-shrink min-w-0 me-3">
-        @await Html.PartialAsync(Partials.Page.SearchBar)
+    <div id="search-bar-l" class="max-[335px]:hidden ms-auto my-auto flex-shrink min-w-0 me-3">
+        <form id="search-bar" method="get" class="flex flex-shrink min-w-0"
+              hx-get="@Endpoints.Feed.Search">
+            <div class="bg-neutral-800 rounded-xl w-full my-auto relative h-12 flex-shrink min-w-0 flex">
+                <input type="text" id="q" name="q" placeholder="Search..." class="h-12 bg-transparent focus:outline-none flex-shrink flex-grow ms-4 me-12 my-auto min-w-0 text-white">
+
+                <button id="clear-button" type="reset" class="absolute right-14 top-0 bottom-0 hover:bg-neutral-600 w-12 hidden"
+                        hx-get="@Endpoints.Feed.Recommendations">
+                    <i class="fa-solid fa-xmark m-auto text-white"></i>
+                </button>
+
+                <button type="submit" class="rounded-r-xl w-12 hover:bg-neutral-600 flex absolute right-0 top-0 bottom-0">
+                    <i class="fa-solid fa-magnifying-glass m-auto text-white"></i>
+                </button>
+            </div>
+        </form>
     </div>
 
     <!--Searchbar: small viewport-->
-    <details class="min-[336px]:hidden flex-shrink-0 ms-auto me-3 my-auto">
+    <details id="search-bar-small-sm-popup" class="min-[336px]:hidden flex-shrink-0 ms-auto me-3 my-auto">
         <!-- Button to be visible -->
         <summary class="rounded-full w-12 h-12 bg-neutral-800 hover:bg-neutral-200 flex cursor-pointer">
             <i class="fa-solid fa-magnifying-glass text-white m-auto"></i>
         </summary>
 
         <!-- Content will be hidden until the user clicks on the summary button. -->
-        <div class="mx-3 h-12 left-0 right-0 top-16 my-2 absolute inset-0 text-gray-600">
-            @await Html.PartialAsync(Partials.Page.SearchBar)
+        <div id="search-bar-sm" class="mx-3 h-12 left-0 right-0 top-16 my-2 absolute inset-0 text-gray-600">
+            <!--#search-bar will be moved here when viewport is small-->
         </div>
     </details>
 
     <script>
-        initSmallViewport();
-        initSearchbar();
+        let searchBar = document.querySelector("#search-bar");
+        let clearButton = searchBar.querySelector("#clear-button");
+        let q = document.querySelector("#q");
 
-        function initSmallViewport() {
-            var details = [...document.querySelectorAll('details')];
-            document.addEventListener('click', function (e) {
-                if (!details.some(f => f.contains(e.target))) {
-                    details.forEach(f => f.removeAttribute('open'));
-                } else {
-                    details.forEach(f => !f.contains(e.target) ? f.removeAttribute('open') : '');
-                }
-            })
+        moveElementDependingOnViewportSize(searchBar, 335, "#search-bar-sm", "#search-bar-l");
+        setupPopup("search-bar-small-sm-popup");
+
+        q.onkeydown = () => {
+            setTimeout(() => {
+                updateClearButton();
+            }, 1);
+        };
+
+        urlChanged();
+        window.addEventListener('urlChanged', urlChanged);
+        function urlChanged() {
+
+            //Sets searchbar to q url query when url changes.
+            q.value = getQuery('q');
+            updateClearButton();
         }
 
-        function initSearchbar() {
-            let previousUrl = '';
-            const observer = new MutationObserver(function (mutations) {
-                if (location.href !== previousUrl) {
-                    previousUrl = location.href;
-                    onUrlChanged();
-                }
-            });
-            const config = { subtree: true, childList: true };
-            observer.observe(document, config);
-
-            onUrlChanged();
-            function onUrlChanged() {
-                setTimeout(() => {
-                    updateClearButton();
-                    updateSearchQuery();
-                }, 10);
-            }
-
-            function updateClearButton() {
-                let visible = getQuery() !== '';
-                document.querySelectorAll('#reset').forEach(e => {
-                    e.classList.toggle("hidden", !visible);
-                });
-            }
-            function updateSearchQuery() {
-                document.querySelectorAll('#q').forEach(e => {
-                    e.value = getQuery();
-                });
-            }
-            function getQuery() {
-                return new URLSearchParams(window.location.search).get('q');
-            }
+        function updateClearButton() {
+            //Sets clear button to visible if either q query or input value is not empty.
+            clearButton.classList.toggle("hidden", !q.value && !getQuery('q'));
         }
     </script>
 </header>
