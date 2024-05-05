@@ -50,9 +50,15 @@
         setupPopup("search-bar-small-sm-popup");
 
         q.onkeydown = () => {
+            //Delay because input.value has not changed yet
             setTimeout(() => {
                 updateClearButton();
             }, 1);
+        };
+
+        clearButton.onclick = () => {
+            q.value = "";
+            updateClearButton();
         };
 
         urlChanged();
@@ -65,7 +71,7 @@
         }
 
         function updateClearButton() {
-            //Sets clear button to visible if either q query or input value is not empty.
+            //Sets clear button to visible if either q query or input has value.
             clearButton.classList.toggle("hidden", !q.value && !getQuery('q'));
         }
     </script>

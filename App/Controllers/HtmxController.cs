@@ -116,6 +116,18 @@ public class HtmxController : Controller
         }
 
         #endregion
+        #region Wrappers
+
+        readonly List<(string start, string end)> wrappers = [];
+
+        /// <summary>Wraps the html response in <paramref name="start"/> and <paramref name="end"/>.</summary>
+        public HtmlResult WrapIn(string start, string end)
+        {
+            wrappers.Add((start, end));
+            return this;
+        }
+
+        #endregion
 
         public override async Task ExecuteResultAsync(ActionContext context)
         {
@@ -127,15 +139,35 @@ public class HtmxController : Controller
             response.Headers["ContentType"] = "text/html";
             var sb = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(title))
-                sb.AppendLine($"<title>{title}</title>");
-
-            foreach (var (partialName, model) in partials)
-                sb.AppendLine(await RenderViewToStringAsync(partialName, model));
+            RenderTitle(sb);
+            RenderWrappersStart(sb);
+            await RenderPartials(sb);
+            RenderWrappersEnd(sb);
 
             using var sw = new StreamWriter(response.Body, Encoding.UTF8);
             await sw.WriteAsync(sb.ToString().RemoveWhitespace());
             await sw.DisposeAsync(); //Must dispose manually, asp.net throws otherwise
+        }
+
+        void RenderTitle(StringBuilder sb)
+        {
+            if (!string.IsNullOrEmpty(title))
+                sb.AppendLine($"<title>{title}</title>");
+        }
+
+        async Task RenderPartials(StringBuilder sb)
+        {
+            foreach (var (partialName, model) in partials)
+                sb.AppendLine(await RenderViewToStringAsync(partialName, model));
+        }
+
+        void RenderWrappersStart(StringBuilder sb) => RenderHtml(sb, wrappers.Select(w => w.start));
+        void RenderWrappersEnd(StringBuilder sb) => RenderHtml(sb, wrappers.Select(w => w.end).Reverse());
+
+        void RenderHtml(StringBuilder sb, IEnumerable<string> html)
+        {
+            foreach (var wrapper in html)
+                sb.AppendLine(wrapper);
         }
 
         //Taken, with modifications, from https://stackoverflow.com/a/65462120/24282772

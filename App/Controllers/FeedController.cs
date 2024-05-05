@@ -11,20 +11,6 @@ public enum FeedKind
 
 public class FeedController : HtmxController
 {
-    public override void OnHTMLResponse(HtmlResult html)
-    {
-        if (Request.Query.TryGetValue("q", out var q))
-        {
-            ViewData["q"] = q;
-            html.SetTitle($"Searching for '{q.ToString().Trim()}' - Youtube clone");
-        }
-        else
-        {
-            ViewData["q"] = q;
-            html.SetTitle("Youtube clone");
-        }
-    }
-
     [Route(Endpoints.Feed.Search)]
     public IActionResult Search([FromQuery] string? q = null, [FromQuery] FeedKind kind = FeedKind.Video)
     {
@@ -40,6 +26,7 @@ public class FeedController : HtmxController
     [Route(Endpoints.Feed.Recommendations)]
     public IActionResult Recommended([FromQuery] FeedKind kind = FeedKind.Video)
     {
+        //TODO: Could we add chat gpt integration here? There seem to be some free alternatives / proxies that could work
         return
             kind == FeedKind.Video
             ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).ToArray())
@@ -66,5 +53,38 @@ public class FeedController : HtmxController
         {
             Name = "test user " + count
         };
+    }
+
+    public override void OnHTMLResponse(HtmlResult html)
+    {
+        SetTitle(html);
+        html.WrapIn(ContainerStart(), ContainerEnd());
+    }
+
+    void SetTitle(HtmlResult html)
+    {
+
+        //Set title on client depending on if request was to search or not
+        if (Request.Query.TryGetValue("q", out var q))
+        {
+            ViewData["q"] = q;
+            html.SetTitle($"Searching for '{q.ToString().Trim()}' - Youtube clone");
+        }
+        else
+        {
+            ViewData["q"] = q;
+            html.SetTitle("Youtube clone");
+        }
+
+    }
+
+    string ContainerStart()
+    {
+        return "<div class='row justify-content-center pe-4'>";
+    }
+
+    string ContainerEnd()
+    {
+        return "</div>";
     }
 }

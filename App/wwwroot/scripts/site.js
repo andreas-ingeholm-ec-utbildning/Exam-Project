@@ -1,5 +1,5 @@
 ﻿//Registers the urlChanged event.
-setTimeout(() => {
+setTimeout(() => {  
         const urlChangedEvent = new Event("urlChanged");
 
         let previousUrl = '';
