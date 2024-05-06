@@ -1,20 +1,18 @@
 ﻿@model Video
 
-<button hx-get="/video/@Model.Id" class="w-96 inline-block">
-    <div class="hover:bg-neutral-600 p-2 rounded-xl">
-        <img src="@Model.ImageUrl" class="w-96 rounded-xl">
+<button hx-get="/video/@Model.Id" class="w-96 inline-block m-4 hover:bg-neutral-600 p-2 rounded-xl">
+    <img src="@Model.ImageUrl" class="w-96 rounded-xl">
 
-        <div class="container">
-            <div class="row">
-                <div class="col-auto rounded-full bg-gray-500 w-12 h-12 m-2 my-auto mt-3">
-                    <img src="@Model.User?.ImageUrl" class="rounded-full">
-                </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-auto rounded-full bg-gray-500 w-12 h-12 m-2 my-auto mt-3 visible md:invisible">
+                <img src="@Model.User?.ImageUrl" class="rounded-full">
+            </div>
 
-                <div class="col my-2 w-16 text-left">
-                    <h2 class="text-gray-300 text-xl text-ellipsis whitespace-nowrap overflow-hidden">@Model.Title</h2>
-                    <h2 class="text-gray-300 text-xs hover:text-gray-200 hover:cursor-pointer text-ellipsis whitespace-nowrap overflow-hidden">@(Model.User?.Name ?? "Unknown user")</h2>
-                    <h2 class="text-gray-300 text-xs text-ellipsis whitespace-nowrap overflow-hidden">@(Model.UploadDate.ToShortDateString() + " " + Model.UploadDate.ToShortTimeString())</h2>
-                </div>
+            <div class="col my-2 w-16 text-left">
+                <h2 class="text-gray-300 text-xl text-ellipsis whitespace-nowrap overflow-hidden">@Model.Title</h2>
+                <h2 class="text-gray-300 text-xs hover:text-gray-200 hover:cursor-pointer text-ellipsis whitespace-nowrap overflow-hidden">@(Model.User?.DisplayName ?? "Unknown user")</h2>
+                <h2 class="text-gray-300 text-xs text-ellipsis whitespace-nowrap overflow-hidden">@(Model.UploadDate.ToShortDateString() + " " + Model.UploadDate.ToShortTimeString())</h2>
             </div>
         </div>
     </div>

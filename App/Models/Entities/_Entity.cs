@@ -2,7 +2,7 @@
 
 namespace App.Models.Entities;
 
-public class Entity
+public interface IEntity
 {
-    [Required] public string Id { get; set; } = null!;
+    [Required] public Guid Id { get; set; }
 }

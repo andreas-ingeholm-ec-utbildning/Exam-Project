@@ -20,7 +20,7 @@ public class FeedController : HtmxController
         return
             kind == FeedKind.Video
             ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).Search(q, v => v.Title).ToArray())
-            : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).Search(q, u => u.Name).ToArray());
+            : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).Search(q, u => u.DisplayName).ToArray());
     }
 
     [Route(Endpoints.Feed.Recommendations)]
@@ -43,7 +43,7 @@ public class FeedController : HtmxController
             ImageUrl = "https://i.ytimg.com/vi/gIRilYj3Tg4/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDWF5fLqJZLdCZzSBCrykcOT_agAQ",
             UploadDate = DateTime.Now,
             WatchUrl = "/watch/test" + count,
-            User = new() { Name = "test userggggggggggggggggggggggggggggggggggggggggggggggggggggggg" }
+            User = new() { DisplayName = "test userggggggggggggggggggggggggggggggggggggggggggggggggggggggg" }
         };
     }
 
@@ -51,7 +51,7 @@ public class FeedController : HtmxController
     {
         return new()
         {
-            Name = "test user " + count
+            DisplayName = "test user " + count
         };
     }
 
@@ -80,7 +80,7 @@ public class FeedController : HtmxController
 
     string ContainerStart()
     {
-        return "<div class='row justify-content-center pe-4'>";
+        return "<div class='row justify-content-center'>";
     }
 
     string ContainerEnd()

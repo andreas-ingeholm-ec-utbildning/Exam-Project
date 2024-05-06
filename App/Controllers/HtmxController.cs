@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using App.Models;
-using App.Models.ViewModels;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -62,7 +61,7 @@ public class HtmxController : Controller
 
     HtmlResult PromptLogin()
     {
-        return new HtmlResult(this).AddPartial(Partials.Views.LoginUser, new LoginOrCreateUserViewModel());
+        return new HtmlResult(this).AddPartial(Partials.Views.LoginUser);
     }
 
     bool IsHtmxRequest()

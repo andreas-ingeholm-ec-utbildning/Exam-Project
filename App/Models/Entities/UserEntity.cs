@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace App.Models.Entities;
 
-public class UserEntity : Entity
+public class UserEntity : IdentityUser<Guid>, IEntity
 {
-    [Required] public string Name { get; set; } = null!;
-    [Required] public string ImageId { get; set; } = null!;
+    public string? ImageId { get; set; }
+
+    public ICollection<CommentEntity> Comments { get; set; } = null!;
 }

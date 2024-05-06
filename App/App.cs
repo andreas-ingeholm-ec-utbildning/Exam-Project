@@ -17,6 +17,7 @@ using App.DB;
 using App.Models.Entities;
 using App.Services;
 using Htmx.TagHelpers;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +25,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTailwindCssTagHelpers(builder.Configuration);
 
-builder.Services.AddTransient<UserContext>();
+builder.Services.AddDbContext<DBContext>();
 builder.Services.AddTransient<EntityService<UserEntity>>();
 builder.Services.AddTransient<EntityService<VideoEntity>>();
+
+builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>().AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 8;
+
+    options.User.RequireUniqueEmail = true;
+});
+
 builder.Services.AddCors(options =>
      {
          options.AddPolicy("AllowAll",
@@ -39,6 +54,7 @@ builder.Services.AddCors(options =>
                  .AllowCredentials();
              });
      });
+
 var app = builder.Build();
 
 app.UseExceptionHandler("/Shared/Error");
@@ -48,9 +64,11 @@ app.UseHsts();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseRouting();
 
-app.UseAuthorization();
 app.MapHtmxAntiforgeryScript();
 
 app.MapControllers();
