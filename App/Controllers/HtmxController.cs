@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using App.Models;
+using App.Models.Entities;
 using App.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -14,59 +16,28 @@ public class HtmxController : Controller
     public IActionResult Html(string html) =>
         new ContentResult() { Content = html };
 
-    public IActionResult Partial<T>(string partial, params T[] models)
-    {
-        return Partial(false, partial, models);
-    }
-
-    public IActionResult Partial(string partial)
-    {
-        return Partial(false, partial);
-    }
-
+    /// <summary>Called right before response is sent. Use this to set title or wrap partials, or similar.</summary>
     public virtual void OnHTMLResponse(HtmlResult html)
     { }
 
-    public IActionResult Partial<T>(bool requireAuth, string partial, params T?[] models)
+    #region Partial
+
+    public IActionResult Partial(string partial)
     {
-        if (!IsHtmxRequest())
-        {
-            return RedirectToHome(Request.Path + Request.QueryString);
-        }
-        else if (requireAuth && !(User.Identity?.IsAuthenticated ?? false))
-        {
-            return PromptLogin();
-        }
-        else
-        {
-            return new HtmlResult(this).AddPartials(partial, models);
-        }
+        return Partial(partial, Array.Empty<object>());
     }
 
-    public IActionResult Partial(bool requireAuth, string partial)
+    public IActionResult Partial<T>(string partial, params T?[] models)
     {
-        if (!IsHtmxRequest())
-        {
-            return RedirectToHome(Request.Path + Request.QueryString);
-        }
-        else if (requireAuth && !(User.Identity?.IsAuthenticated ?? false))
-        {
-            return PromptLogin();
-        }
-        else
-        {
-            return new HtmlResult(this).AddPartial(partial);
-        }
+        return
+            IsHtmxRequest()
+            ? new HtmlResult(this).AddPartials(partial, models)
+            : RedirectToHome((Request?.Path + Request?.QueryString) ?? Endpoints.Feed.Recommendations);
     }
 
-    HtmlResult PromptLogin()
+    public bool IsHtmxRequest()
     {
-        return new HtmlResult(this).AddPartial(Partials.Views.LoginUser);
-    }
-
-    bool IsHtmxRequest()
-    {
-        return Request.Headers["hx-request"] == "true";
+        return Request is not null && Request.Headers["hx-request"] == "true";
     }
 
     IActionResult RedirectToHome(string requestUrl)
@@ -75,10 +46,33 @@ public class HtmxController : Controller
         return View("~/Views/Home/Index.cshtml", new HomeViewModel(requestUrl));
     }
 
-    public bool IsAuthorized()
+    #endregion
+    #region User
+
+    public bool IsAuthenticated()
     {
         return User.Identity?.IsAuthenticated ?? false;
     }
+
+    public async Task<UserEntity?> GetUserAsync()
+    {
+        if (User.Identity?.IsAuthenticated ?? false)
+        {
+            var entity = await Service.Get<UserManager<UserEntity>>().FindByNameAsync(User.Identity!.Name!);
+            if (entity is null)
+            {
+                //Something is wrong, we can't find user, let's sign out whatever asp.net has logged in
+                await Service.Get<SignInManager<UserEntity>>().SignOutAsync();
+                return null;
+            }
+
+            return entity;
+        }
+
+        return null;
+    }
+
+    #endregion
 
     public class HtmlResult(HtmxController controller) : ContentResult
     {
@@ -108,8 +102,11 @@ public class HtmxController : Controller
         /// <summary>Renders all models with the specified partial.</summary>
         public HtmlResult AddPartials<T>(string name, params T[] model)
         {
-            foreach (var obj in model)
-                partials.Add((name, obj));
+            if (model.Length == 0)
+                partials.Add((name, null));
+            else
+                foreach (var obj in model)
+                    partials.Add((name, obj));
 
             return this;
         }
@@ -127,6 +124,7 @@ public class HtmxController : Controller
         }
 
         #endregion
+        #region Render
 
         public override async Task ExecuteResultAsync(ActionContext context)
         {
@@ -142,6 +140,8 @@ public class HtmxController : Controller
             RenderWrappersStart(sb);
             await RenderPartials(sb);
             RenderWrappersEnd(sb);
+
+            var sod = sb.ToString();
 
             using var sw = new StreamWriter(response.Body, Encoding.UTF8);
             await sw.WriteAsync(sb.ToString().RemoveWhitespace());
@@ -163,7 +163,7 @@ public class HtmxController : Controller
         void RenderWrappersStart(StringBuilder sb) => RenderHtml(sb, wrappers.Select(w => w.start));
         void RenderWrappersEnd(StringBuilder sb) => RenderHtml(sb, wrappers.Select(w => w.end).Reverse());
 
-        void RenderHtml(StringBuilder sb, IEnumerable<string> html)
+        static void RenderHtml(StringBuilder sb, IEnumerable<string> html)
         {
             foreach (var wrapper in html)
                 sb.AppendLine(wrapper);
@@ -218,5 +218,7 @@ public class HtmxController : Controller
 
             return viewResult.View;
         }
+
+        #endregion
     }
 }

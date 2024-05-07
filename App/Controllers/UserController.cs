@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers;
 
-public class UserController(SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext) : HtmxController
+public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext) : HtmxController
 {
     [HttpGet(Endpoints.User.Me)]
     public async Task<IActionResult> Me()
     {
-        if (!User.Identity?.IsAuthenticated ?? false)
+        if (!IsAuthenticated())
             return Partial(Partials.Views.LoginUser);
 
         var user = await userManager.FindByNameAsync(User.Identity!.Name!);
@@ -22,24 +22,19 @@ public class UserController(SignInManager<UserEntity> signInManager, UserManager
         {
             await signInManager.SignOutAsync();
             ModelState.AddModelError("", "Something went wrong, please try log in again.");
-            return Partial(Partials.Views.LoginUser);
+            return Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = "/user/me" });
         }
 
-        return Partial(true, Partials.Views.User, (User?)user);
+        return Partial(Partials.Views.User, (User?)user);
     }
 
     [HttpGet(Endpoints.User.Bookmarks)]
-    public IActionResult Bookmarks()
-    {
-        return Partial(true, Partials.Views.Bookmarks);
-    }
+    public IActionResult Bookmarks() =>
+        IsAuthenticated()
+        ? Partial(Partials.Views.Bookmarks)
+        : Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = Endpoints.User.Bookmarks });
 
-    [HttpPost(Endpoints.User.Logout)]
-    public async Task<IActionResult> Logout()
-    {
-        await signInManager.SignOutAsync();
-        return RedirectToAction("Index", "Home");
-    }
+    #region Login / Logout
 
     [HttpGet(Endpoints.User.Login)]
     public IActionResult Login()
@@ -47,30 +42,42 @@ public class UserController(SignInManager<UserEntity> signInManager, UserManager
         return Partial(Partials.Views.LoginUser);
     }
 
-    [HttpGet(Endpoints.User.Create)]
-    public IActionResult Create()
-    {
-        return Partial(Partials.Views.CreateUser);
-    }
-
     [HttpPost(Endpoints.User.Login)]
     public async Task<IActionResult> Login(LoginUserViewModel viewModel)
     {
-        if (ModelState.IsValid)
+        if (viewModel is not null && ModelState.IsValid)
         {
-            var user = await userManager.FindByEmailAsync(viewModel.EmailAddress);
-
-            if (user is not null)
+            if (await userManager.FindByEmailAsync(viewModel.EmailAddress) is UserEntity user)
             {
                 var result = await signInManager.PasswordSignInAsync(user, viewModel.Password, viewModel.RememberMe, false);
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                    return Redirect(viewModel.RedirectUrl ?? Endpoints.User.Me);
             }
         }
 
         ModelState.Clear();
         ModelState.AddModelError("", "Could not log in.");
         return Partial(Partials.Views.LoginUser, viewModel);
+    }
+
+    [HttpPost(Endpoints.User.Logout)]
+    [HttpGet(Endpoints.User.Logout)] //User could navigate here manually
+    public async Task<IActionResult> Logout()
+    {
+        if (!IsHtmxRequest() || Request.Method != "POST")
+            return Redirect("/");
+
+        await signInManager.SignOutAsync();
+        return feedController.Recommended();
+    }
+
+    #endregion
+    #region Create
+
+    [HttpGet(Endpoints.User.Create)]
+    public IActionResult Create()
+    {
+        return Partial(Partials.Views.CreateUser);
     }
 
     [HttpPost(Endpoints.User.Create)]
@@ -102,6 +109,8 @@ public class UserController(SignInManager<UserEntity> signInManager, UserManager
         await dbContext.SaveChangesAsync();
         await signInManager.PasswordSignInAsync(entity, viewModel.Password, viewModel.RememberMe, false);
 
-        return RedirectToAction("Index", "Home");
+        return Partial(Partials.Views.User, (User)entity);
     }
+
+    #endregion
 }

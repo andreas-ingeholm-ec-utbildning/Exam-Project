@@ -8,7 +8,20 @@
     <form hx-post="@Endpoints.User.Login" class="m-auto flex flex-col w-80">
         <input asp-for=EmailAddress type="text" placeholder="Email address..." class="h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 my-2 min-w-0 text-white">
         <input asp-for=Password type="password" placeholder="Password..." class="h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 my-2 min-w-0 text-white">
-        <text>123456Aa!</text>
+        
+        <!--Sets redirect url, that is passed from controller-->
+        <input asp-for="RedirectUrl" class="hidden" value="@Model?.RedirectUrl"/>
+
+        @if (System.Diagnostics.Debugger.IsAttached)
+        {
+            <!--Password for convinience-->
+            <p class="h-0">123456Aa!</p>
+        }
+
+        <div class="flex-col self-end me-2">
+            <label asp-for="RememberMe" class="text-white ms-auto me-2">Remember me</label>
+            <input asp-for="RememberMe" type="checkbox" />
+        </div>
 
         <div asp-validation-summary="All" class="text-red-600 mt-5 mb-2 text-center whitespace-pre"></div>
         <button type="submit" class="mb-1 bg-neutral-800 hover:bg-neutral-600 rounded-xl h-16 flex transition-colors text-white">

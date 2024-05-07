@@ -1,18 +1,7 @@
-//TODO: Make 'overlays', feed view (home + search), user view, watch view
-
 //TODO: Videos
 //TODO: Use https://github.com/mudler/LocalAI to sort items, to make an 'algorithm'
 
-//TODO: Users
-//TODO: Implement users
-//TODO: Implement create / login
-//TODO: Implement user page
-
-//TODO: Feed view
-//TODO: 
-
-//TODO: Make uris more user friendly (/user/<id of user>), but make it as a translation layer client side
-
+using App.Controllers;
 using App.DB;
 using App.Models.Entities;
 using App.Services;
@@ -28,6 +17,7 @@ builder.Services.AddTailwindCssTagHelpers(builder.Configuration);
 builder.Services.AddDbContext<DBContext>();
 builder.Services.AddTransient<EntityService<UserEntity>>();
 builder.Services.AddTransient<EntityService<VideoEntity>>();
+builder.Services.AddTransient<FeedController>();
 
 builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>().AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
 
@@ -56,6 +46,7 @@ builder.Services.AddCors(options =>
      });
 
 var app = builder.Build();
+Service.Initialize(app.Services);
 
 app.UseExceptionHandler("/Shared/Error");
 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -70,6 +61,7 @@ app.UseAuthorization();
 app.UseRouting();
 
 app.MapHtmxAntiforgeryScript();
+
 
 app.MapControllers();
 app.MapControllerRoute(

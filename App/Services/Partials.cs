@@ -10,7 +10,6 @@ public static class Partials
 
     public static class Views
     {
-        public const string Feed = "Views/_Feed";
         public const string Video = "Views/_Video";
         public const string LoginUser = "Views/_LoginUser";
         public const string CreateUser = "Views/_CreateUser";

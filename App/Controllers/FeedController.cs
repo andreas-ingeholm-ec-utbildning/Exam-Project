@@ -11,6 +11,16 @@ public enum FeedKind
 
 public class FeedController : HtmxController
 {
+    [Route(Endpoints.Feed.Recommendations)]
+    public IActionResult Recommended([FromQuery] FeedKind kind = FeedKind.Video)
+    {
+        //TODO: Could we add chat gpt integration here? There seem to be some free alternatives / proxies that could work
+        return
+            kind == FeedKind.Video
+            ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).ToArray())
+            : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).ToArray());
+    }
+
     [Route(Endpoints.Feed.Search)]
     public IActionResult Search([FromQuery] string? q = null, [FromQuery] FeedKind kind = FeedKind.Video)
     {
@@ -23,15 +33,6 @@ public class FeedController : HtmxController
             : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).Search(q, u => u.DisplayName).ToArray());
     }
 
-    [Route(Endpoints.Feed.Recommendations)]
-    public IActionResult Recommended([FromQuery] FeedKind kind = FeedKind.Video)
-    {
-        //TODO: Could we add chat gpt integration here? There seem to be some free alternatives / proxies that could work
-        return
-            kind == FeedKind.Video
-            ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).ToArray())
-            : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).ToArray());
-    }
 
     Video GetVideo(int count)
     {
@@ -80,6 +81,7 @@ public class FeedController : HtmxController
 
     string ContainerStart()
     {
+        //Allows us to center items horiztonally, without messing with other views
         return "<div class='row justify-content-center'>";
     }
 
