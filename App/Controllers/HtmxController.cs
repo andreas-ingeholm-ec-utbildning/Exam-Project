@@ -78,10 +78,20 @@ public class HtmxController : Controller
     {
         #region Title
 
-        string? title;
+        public HtmlResult SetTitle(string title)
+        {
+            partials.Insert(0, ("Part/_Title", title));
+            return this;
+        }
 
-        public void SetTitle(string title) =>
-            this.title = title;
+        #endregion
+        #region Background
+
+        public HtmlResult SetBackground(string background)
+        {
+            partials.Insert(0, ("Part/_Background", background));
+            return this;
+        }
 
         #endregion
         #region Partials
@@ -136,22 +146,13 @@ public class HtmxController : Controller
             response.Headers["ContentType"] = "text/html";
             var sb = new StringBuilder();
 
-            RenderTitle(sb);
             RenderWrappersStart(sb);
             await RenderPartials(sb);
             RenderWrappersEnd(sb);
 
-            var sod = sb.ToString();
-
             using var sw = new StreamWriter(response.Body, Encoding.UTF8);
             await sw.WriteAsync(sb.ToString().RemoveWhitespace());
             await sw.DisposeAsync(); //Must dispose manually, asp.net throws otherwise
-        }
-
-        void RenderTitle(StringBuilder sb)
-        {
-            if (!string.IsNullOrEmpty(title))
-                sb.AppendLine($"<title>{title}</title>");
         }
 
         async Task RenderPartials(StringBuilder sb)

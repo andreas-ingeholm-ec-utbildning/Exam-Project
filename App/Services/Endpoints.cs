@@ -51,6 +51,7 @@ public static class Endpoints
         public const string Logout = "/user/logout";
         public const string Create = "/user/create";
         public const string Bookmarks = "/user/bookmarks";
+        public const string Upload = "/user/upload";
 
         /// <summary>The endpoint to retrieve user info. <b>Requires id query</b>.</summary>
         /// <remarks><b>get, (auth) post</b></remarks>
@@ -59,6 +60,7 @@ public static class Endpoints
         /// <summary>The endpoint to retrieve user videos. <b>Requires id query</b>.</summary>
         /// <remarks><b>get</b></remarks>
         public const string UserVideos = "/user/videos";
+        public const string UserComments = "/user/comments";
 
         /// <summary>The endpoint to delete user. <b>Requires id query</b>.</summary>
         /// <remarks><b>(auth) post</b></remarks>

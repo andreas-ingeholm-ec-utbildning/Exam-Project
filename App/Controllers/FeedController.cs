@@ -33,8 +33,7 @@ public class FeedController : HtmxController
             : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).Search(q, u => u.DisplayName).ToArray());
     }
 
-
-    Video GetVideo(int count)
+    public Video GetVideo(int count)
     {
         return new()
         {

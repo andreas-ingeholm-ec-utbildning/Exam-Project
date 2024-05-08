@@ -11,6 +11,20 @@ namespace App.Controllers;
 
 public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext) : HtmxController
 {
+    [HttpGet(Endpoints.User.Bookmarks)]
+    public IActionResult Bookmarks() =>
+        IsAuthenticated()
+        ? Partial(Partials.Views.Bookmarks)
+        : Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = Endpoints.User.Bookmarks });
+
+    [HttpGet(Endpoints.User.Upload)]
+    public IActionResult Upload() =>
+        IsAuthenticated()
+        ? Partial(Partials.Views.Upload)
+        : Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = Endpoints.User.Upload });
+
+    #region User
+
     [HttpGet(Endpoints.User.Me)]
     public async Task<IActionResult> Me()
     {
@@ -25,15 +39,48 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
             return Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = "/user/me" });
         }
 
-        return Partial(Partials.Views.User, (User?)user);
+        return await UserVideos(user.UserName);
     }
 
-    [HttpGet(Endpoints.User.Bookmarks)]
-    public IActionResult Bookmarks() =>
-        IsAuthenticated()
-        ? Partial(Partials.Views.Bookmarks)
-        : Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = Endpoints.User.Bookmarks });
+    [HttpGet("/{user:alpha}")]
+    [HttpGet("/{user:alpha}/videos")]
+    public async Task<IActionResult> UserVideos(string? user, [FromQuery] int page = 0)
+    {
+        var entity = await userManager.FindByNameAsync(user ?? "");
+        if (entity is null)
+            return Partial("Views/Error", $"No such user found.");
 
+        var result = Partial("Part/_UserHeader", (User)entity);
+        if (result is HtmlResult html)
+        {
+            html.AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Select(feedController.GetVideo).ToArray());
+            html.WrapIn("<div class='row justify-content-center me-4 mt-44'>", "</div>");
+            html.SetTitle($"{entity.UserName!} - Videos - Youtube clone");
+            html.SetBackground("FontAwesome/_Video");
+        }
+
+        return result;
+    }
+
+    [HttpGet("/{user:alpha}/comments")]
+    public async Task<IActionResult> UserComments(string? user, [FromQuery] int page = 0)
+    {
+        var entity = await userManager.FindByNameAsync(user ?? "");
+        if (entity is null)
+            return Partial("Views/Error", $"No such user found.");
+
+        var result = Partial("Part/_UserHeader", (User)entity);
+        if (result is HtmlResult html)
+        {
+            //html.AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Skip(page * 10).Take(10).Select(feedController.GetVideo).ToArray());
+            html.SetTitle($"{entity.UserName!} - Comments - Youtube clone");
+            html.SetBackground("FontAwesome/_Comment");
+        }
+
+        return result;
+    }
+
+    #endregion
     #region Login / Logout
 
     [HttpGet(Endpoints.User.Login)]

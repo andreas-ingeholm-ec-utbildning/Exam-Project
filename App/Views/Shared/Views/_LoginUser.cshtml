@@ -2,7 +2,9 @@
 
 <title>Login - Youtube clone</title>
 
-<div class="flex flex-col mt-20">
+@await Html.PartialAsync("Part/_Background", "FontAwesome/_LoginUser");
+
+<div class="flex flex-col z-10">
     <text class="text-center text-white text-5xl my-10">Login</text>
 
     <form hx-post="@Endpoints.User.Login" class="m-auto flex flex-col w-80">

@@ -1,5 +1,6 @@
 //TODO: Videos
 //TODO: Use https://github.com/mudler/LocalAI to sort items, to make an 'algorithm'
+//TODO: Reserve user names, to make sure that they do not choose the same names as an endpoint
 
 using App.Controllers;
 using App.DB;
