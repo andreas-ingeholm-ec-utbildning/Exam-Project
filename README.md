@@ -1,4 +1,4 @@
-# exam project
+# Exam project
  A simplistic youtube clone created for a exam project.
 
 ## Frameworks / libraries
