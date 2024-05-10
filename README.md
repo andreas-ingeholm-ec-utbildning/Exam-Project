@@ -15,6 +15,9 @@ This project uses the following:
 - [x] User models
 - [ ] Video models + upload functionality
 - [ ] User avatars
+- [ ] Return actual data for videos, users, and video. Instead of dummy data.
+- [ ] Add comments
+- [ ] Add bookmarks (links to either a video or user)
 
 #### Client
 - [x] Header
@@ -28,5 +31,4 @@ This project uses the following:
 - [x] User page
 - [ ] Upload video page
 - [ ] Bookmarks page
-- [ ] Start returning actual data, instead of dummy data, for feed view
-- [ ] Show actual video, instead of dummy video, for video view
+- [ ] Video view.
