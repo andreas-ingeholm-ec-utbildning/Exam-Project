@@ -13,6 +13,7 @@ This project uses the following:
 #### Server:
 - [x] Setup HtmlResult.
 - [x] User models
+- [x] User create and login.
 - [ ] Video models + upload functionality
 - [ ] User avatars
 - [ ] Return actual data for videos, users, and video. Instead of dummy data.
