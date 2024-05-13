@@ -22,9 +22,9 @@ This project uses the following:
 
 #### Client
 - [x] Header
-- [x] Searchbar
 - [x] Sidebar
 - [x] Feed view, with dummy data
+- [x] Searchbar
 - [x] Log in view
 - [x] Create user view
 - [x] User view
