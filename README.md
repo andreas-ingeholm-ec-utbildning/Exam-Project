@@ -11,12 +11,12 @@ This project uses the following:
 
 ## TODO:
 #### Server:
-- [x] Setup HtmlResult.
+- [x] Setup HtmlResult
 - [x] User models
-- [x] User create and login.
+- [x] User create and login
 - [ ] Video models + upload functionality
 - [ ] User avatars
-- [ ] Return actual data for videos, users, and video streams. Instead of dummy data / placeholders.
+- [ ] Return actual data for videos, users, and video streams. Instead of dummy data / placeholders
 - [ ] Add comments
 - [ ] Add bookmarks (links to either a video or user)
 
@@ -31,4 +31,4 @@ This project uses the following:
 - [x] User page
 - [ ] Upload video page
 - [ ] Bookmarks page
-- [ ] Video view.
+- [ ] Video view
