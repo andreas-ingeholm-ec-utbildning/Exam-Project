@@ -18,6 +18,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
             return Login(redirectUrl: Endpoints.User.Bookmarks);
 
         SetTitle("Bookmarks - Youtube clone");
+        SetBackground(Partials.Backgrounds.Bookmark);
         AddPartial(Partials.Views.Bookmarks);
         return GeneratedHtml();
     }
@@ -29,6 +30,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
             return Login(redirectUrl: Endpoints.User.Upload);
 
         SetTitle("Upload - Youtube clone");
+        SetBackground(Partials.Backgrounds.Upload);
         AddPartial(Partials.Views.Upload);
         return GeneratedHtml();
     }
@@ -36,6 +38,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     #region User
 
     [HttpGet(Endpoints.User.Me)]
+    [HttpGet("/user")]
     public async Task<IActionResult> Me()
     {
         if (!IsAuthenticated())
@@ -46,7 +49,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         {
             await signInManager.SignOutAsync();
             ModelState.AddModelError("", "Something went wrong, please try log in again.");
-            return Login(Endpoints.User.Me);
+            return Login();
         }
 
         return await UserVideos(user.UserName);
@@ -100,6 +103,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     public IActionResult Login(string? redirectUrl = null)
     {
         SetTitle("Login - Youtube clone");
+        SetBackground(Partials.Backgrounds.LoginUser);
         AddPartial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = redirectUrl });
         return GeneratedHtml();
     }
@@ -144,6 +148,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     public IActionResult Create()
     {
         SetTitle("Create user - Youtube clone");
+        SetBackground(Partials.Backgrounds.CreateUser);
         AddPartial(Partials.Views.CreateUser);
         return GeneratedHtml();
     }
