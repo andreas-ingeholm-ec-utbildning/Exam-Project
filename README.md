@@ -28,7 +28,6 @@ This project uses the following:
 - [x] Log in view
 - [x] Create user view
 - [x] User view
-- [x] User login / create
 - [x] User page
 - [ ] Upload video page
 - [ ] Bookmarks page
