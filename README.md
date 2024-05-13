@@ -16,7 +16,7 @@ This project uses the following:
 - [x] User create and login.
 - [ ] Video models + upload functionality
 - [ ] User avatars
-- [ ] Return actual data for videos, users, and video streams. Instead of dummy data.
+- [ ] Return actual data for videos, users, and video streams. Instead of dummy data / placeholders.
 - [ ] Add comments
 - [ ] Add bookmarks (links to either a video or user)
 
