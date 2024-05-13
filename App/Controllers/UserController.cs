@@ -12,16 +12,26 @@ namespace App.Controllers;
 public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext) : HtmxController
 {
     [HttpGet(Endpoints.User.Bookmarks)]
-    public IActionResult Bookmarks() =>
-        IsAuthenticated()
-        ? Partial(Partials.Views.Bookmarks)
-        : Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = Endpoints.User.Bookmarks });
+    public IActionResult Bookmarks()
+    {
+        if (!IsAuthenticated())
+            return Login(redirectUrl: Endpoints.User.Bookmarks);
+
+        SetTitle("Bookmarks - Youtube clone");
+        AddPartial(Partials.Views.Bookmarks);
+        return GeneratedHtml();
+    }
 
     [HttpGet(Endpoints.User.Upload)]
-    public IActionResult Upload() =>
-        IsAuthenticated()
-        ? Partial(Partials.Views.Upload)
-        : Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = Endpoints.User.Upload });
+    public IActionResult Upload()
+    {
+        if (!IsAuthenticated())
+            return Login(redirectUrl: Endpoints.User.Upload);
+
+        SetTitle("Upload - Youtube clone");
+        AddPartial(Partials.Views.Upload);
+        return GeneratedHtml();
+    }
 
     #region User
 
@@ -29,14 +39,14 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     public async Task<IActionResult> Me()
     {
         if (!IsAuthenticated())
-            return Partial(Partials.Views.LoginUser);
+            return Login();
 
         var user = await userManager.FindByNameAsync(User.Identity!.Name!);
         if (user is null)
         {
             await signInManager.SignOutAsync();
             ModelState.AddModelError("", "Something went wrong, please try log in again.");
-            return Partial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = "/user/me" });
+            return Login(Endpoints.User.Me);
         }
 
         return await UserVideos(user.UserName);
@@ -48,18 +58,20 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     {
         var entity = await userManager.FindByNameAsync(user ?? "");
         if (entity is null)
-            return Partial("Views/Error", $"No such user found.");
+            return Error("No such user found.", "No such user found.");
 
-        var result = Partial("Part/_UserHeader", (User)entity);
-        if (result is HtmlResult html)
-        {
-            html.AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Select(feedController.GetVideo).ToArray());
-            html.WrapIn("<div class='row justify-content-center me-4 mt-44'>", "</div>");
-            html.SetTitle($"{entity.UserName!} - Videos - Youtube clone");
-            html.SetBackground("FontAwesome/_Video");
-        }
+        if (!IsHtmxRequest())
+            return RedirectToHome();
 
-        return result;
+        SetTitle($"{entity.UserName!} - Videos - Youtube clone");
+        SetBackground(Partials.Backgrounds.Video);
+        WrapIn(Partials.Part.Feed);
+
+        AddPartial(Partials.Part.UserPageHeader, (User)entity);
+        AddPartial(Partials.Part.TailwindContainer, "mt-44");
+        AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Select(feedController.GetVideo).ToArray());
+
+        return GeneratedHtml();
     }
 
     [HttpGet("/{user:alpha}/comments")]
@@ -67,26 +79,29 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     {
         var entity = await userManager.FindByNameAsync(user ?? "");
         if (entity is null)
-            return Partial("Views/Error", $"No such user found.");
+            return Error("No such user found.", "No such user found.");
 
-        var result = Partial("Part/_UserHeader", (User)entity);
-        if (result is HtmlResult html)
-        {
-            //html.AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Skip(page * 10).Take(10).Select(feedController.GetVideo).ToArray());
-            html.SetTitle($"{entity.UserName!} - Comments - Youtube clone");
-            html.SetBackground("FontAwesome/_Comment");
-        }
+        if (!IsHtmxRequest())
+            return RedirectToHome();
 
-        return result;
+        SetTitle($"{entity.UserName!} - Comments - Youtube clone");
+        SetBackground(Partials.Backgrounds.Comment);
+        WrapIn(Partials.Part.Feed);
+
+        AddPartial(Partials.Part.UserPageHeader, (User)entity);
+
+        return GeneratedHtml();
     }
 
     #endregion
     #region Login / Logout
 
     [HttpGet(Endpoints.User.Login)]
-    public IActionResult Login()
+    public IActionResult Login(string? redirectUrl = null)
     {
-        return Partial(Partials.Views.LoginUser);
+        SetTitle("Login - Youtube clone");
+        AddPartial(Partials.Views.LoginUser, new LoginUserViewModel() { RedirectUrl = redirectUrl });
+        return GeneratedHtml();
     }
 
     [HttpPost(Endpoints.User.Login)]
@@ -104,7 +119,11 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
 
         ModelState.Clear();
         ModelState.AddModelError("", "Could not log in.");
-        return Partial(Partials.Views.LoginUser, viewModel);
+        AddPartial(Partials.Views.LoginUser, viewModel);
+
+        SetTitle("Login - Youtube clone");
+        SetBackground(Partials.Backgrounds.LoginUser);
+        return GeneratedHtml();
     }
 
     [HttpPost(Endpoints.User.Logout)]
@@ -112,7 +131,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     public async Task<IActionResult> Logout()
     {
         if (!IsHtmxRequest() || Request.Method != "POST")
-            return Redirect("/");
+            return RedirectToHome(string.Empty);
 
         await signInManager.SignOutAsync();
         return feedController.Recommended();
@@ -124,7 +143,9 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     [HttpGet(Endpoints.User.Create)]
     public IActionResult Create()
     {
-        return Partial(Partials.Views.CreateUser);
+        SetTitle("Create user - Youtube clone");
+        AddPartial(Partials.Views.CreateUser);
+        return GeneratedHtml();
     }
 
     [HttpPost(Endpoints.User.Create)]
@@ -139,8 +160,11 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         if (await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.DisplayName) is not null)
             ModelState.AddModelError("", "Display name already in use.");
 
+        SetTitle("Create user - Youtube clone");
+        SetBackground(Partials.Backgrounds.CreateUser);
+
         if (!ModelState.IsValid)
-            return Partial(Partials.Views.CreateUser, viewModel);
+            return AddPartial(Partials.Views.CreateUser, viewModel).GeneratedHtml();
 
         var entity = new UserEntity() { Email = viewModel.EmailAddress, UserName = viewModel.DisplayName! };
 
@@ -150,13 +174,15 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
 
-            return Partial(Partials.Views.CreateUser, viewModel);
+            return AddPartial(Partials.Views.CreateUser, viewModel).GeneratedHtml();
         }
 
         await dbContext.SaveChangesAsync();
         await signInManager.PasswordSignInAsync(entity, viewModel.Password, viewModel.RememberMe, false);
 
-        return Partial(Partials.Views.User, (User)entity);
+        AddPartial(Partials.Views.User, (User)entity);
+
+        return GeneratedHtml();
     }
 
     #endregion

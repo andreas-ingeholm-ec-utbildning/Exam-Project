@@ -15,10 +15,16 @@ public class FeedController : HtmxController
     public IActionResult Recommended([FromQuery] FeedKind kind = FeedKind.Video)
     {
         //TODO: Could we add chat gpt integration here? There seem to be some free alternatives / proxies that could work
-        return
-            kind == FeedKind.Video
-            ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).ToArray())
-            : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).ToArray());
+
+        SetTitle("Youtube clone");
+        WrapIn(Partials.Part.Feed);
+
+        if (kind == FeedKind.Video)
+            AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).ToArray());
+        else if (kind == FeedKind.User)
+            AddPartials(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).ToArray());
+
+        return GeneratedHtml();
     }
 
     [Route(Endpoints.Feed.Search)]
@@ -27,10 +33,15 @@ public class FeedController : HtmxController
         if (string.IsNullOrEmpty(q))
             return Recommended(kind);
 
-        return
-            kind == FeedKind.Video
-            ? Partial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).Search(q, v => v.Title).ToArray())
-            : Partial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).Search(q, u => u.DisplayName).ToArray());
+        SetTitle($"Searching for '{q.ToString().Trim()}' - Youtube clone");
+        WrapIn(Partials.Part.Feed);
+
+        if (kind == FeedKind.Video)
+            AddPartial(Partials.Item.Video, Enumerable.Range(1, 50).Select(GetVideo).Search(q, v => v.Title).ToArray());
+        else
+            AddPartial(Partials.Item.User, Enumerable.Range(1, 50).Select(GetUser).Search(q, u => u.DisplayName).ToArray());
+
+        return GeneratedHtml();
     }
 
     public Video GetVideo(int count)
@@ -53,39 +64,5 @@ public class FeedController : HtmxController
         {
             DisplayName = "test user " + count
         };
-    }
-
-    public override void OnHTMLResponse(HtmlResult html)
-    {
-        SetTitle(html);
-        html.WrapIn(ContainerStart(), ContainerEnd());
-    }
-
-    void SetTitle(HtmlResult html)
-    {
-
-        //Set title on client depending on if request was to search or not
-        if (Request.Query.TryGetValue("q", out var q))
-        {
-            ViewData["q"] = q;
-            html.SetTitle($"Searching for '{q.ToString().Trim()}' - Youtube clone");
-        }
-        else
-        {
-            ViewData["q"] = q;
-            html.SetTitle("Youtube clone");
-        }
-
-    }
-
-    string ContainerStart()
-    {
-        //Allows us to center items horiztonally, without messing with other views
-        return "<div class='row justify-content-center'>";
-    }
-
-    string ContainerEnd()
-    {
-        return "</div>";
     }
 }

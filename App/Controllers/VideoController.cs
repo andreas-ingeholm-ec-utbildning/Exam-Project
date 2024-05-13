@@ -9,7 +9,10 @@ public class VideoController : HtmxController
     [Route("/video/{id?}")]
     public IActionResult Index(string id)
     {
-        return Partial(Partials.Views.Video);
+        SetTitle("{video title} - Youtube clone");
+        AddPartial(Partials.Views.Video);
+
+        return GeneratedHtml();
     }
 
 }

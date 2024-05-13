@@ -1,6 +1,9 @@
 //TODO: Videos
 //TODO: Use https://github.com/mudler/LocalAI to sort items, to make an 'algorithm'
 //TODO: Reserve user names, to make sure that they do not choose the same names as an endpoint
+//TODO: Test error
+//TODO: Add background image to error page
+//TODO: Change all root to view in all view partials
 
 using App.Controllers;
 using App.DB;
