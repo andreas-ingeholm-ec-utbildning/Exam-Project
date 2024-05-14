@@ -13,6 +13,7 @@ public static class Partials
         public const string Video = "Views/_Video";
         public const string LoginUser = "Views/_LoginUser";
         public const string CreateUser = "Views/_CreateUser";
+        public const string EditUser = "Views/_EditUser";
         public const string Bookmarks = "Views/_Bookmarks";
         public const string Upload = "Views/_Upload";
         public const string User = "Views/_User";
@@ -40,6 +41,7 @@ public static class Partials
         public const string Comment = "FontAwesome/_Comment";
         public const string CreateUser = "FontAwesome/_CreateUser";
         public const string LoginUser = "FontAwesome/_LoginUser";
+        public const string EditUser = "FontAwesome/_EditUser";
         public const string Upload = "FontAwesome/_Upload";
         public const string User = "FontAwesome/_User";
         public const string Video = "FontAwesome/_Video";

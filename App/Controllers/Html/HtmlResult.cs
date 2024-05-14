@@ -100,8 +100,18 @@ public class HtmlResult(HtmxController controller) : ContentResult, IHtmlResult
         var response = context.HttpContext.Response;
         response.Headers["ContentType"] = "text/html";
 
-        var html = await RenderPartials();
-        html = await RenderWrappers(html);
+        var html = "";
+        try
+        {
+            html = await RenderPartials();
+            html = await RenderWrappers(html);
+        }
+        catch (Exception ex)
+        {
+            controller.Error("An error occured", ex.Message);
+            html = await RenderPartials();
+        }
+
         html = html.RemoveWhitespace();
 
         using var sw = new StreamWriter(response.Body, Encoding.UTF8);

@@ -78,7 +78,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     }
 
     [HttpGet("/{user:alpha}/comments")]
-    public async Task<IActionResult> UserComments(string? user, [FromQuery] int page = 0)
+    public async Task<IActionResult> UserComments(string? user)
     {
         var entity = await userManager.FindByNameAsync(user ?? "");
         if (entity is null)
@@ -94,6 +94,32 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         AddPartial(Partials.Part.UserPageHeader, (User)entity);
 
         return GeneratedHtml();
+    }
+
+    [HttpGet(Endpoints.User.Edit)]
+    public async Task<IActionResult> Edit()
+    {
+        if (!IsAuthenticated())
+            return Login(redirectUrl: Endpoints.User.Upload);
+
+        var entity = await userManager.FindByNameAsync(User.Identity!.Name!);
+        if (entity is null)
+            return Error("No such user found.", "No such user found.");
+
+        var user = (User)entity;
+
+        SetTitle("Edit - Youtube clone");
+        SetBackground(Partials.Backgrounds.EditUser);
+        AddPartial(Partials.Views.EditUser, new EditUserViewModel(user));
+        return GeneratedHtml();
+    }
+
+    [HttpPost(Endpoints.User.Edit)]
+    public async Task<IActionResult> Edit(EditUserViewModel viewModel)
+    {
+
+        return Ok();
+
     }
 
     #endregion

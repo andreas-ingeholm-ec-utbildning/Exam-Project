@@ -49,6 +49,7 @@ public static class Endpoints
 
         public const string Login = "/user/login";
         public const string Logout = "/user/logout";
+        public const string Edit = "/user/edit";
         public const string Create = "/user/create";
         public const string Bookmarks = "/user/bookmarks";
         public const string Upload = "/user/upload";
