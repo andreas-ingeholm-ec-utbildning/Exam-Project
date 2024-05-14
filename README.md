@@ -9,6 +9,8 @@ This project uses the following:
 * Tailwind 
 * Font awesome
 
+![](https://raw.githubusercontent.com/andreas-ingeholm-ec-utbildning/Exam-Project/main/image/Screenshot%202024-05-13%20175912.png)
+
 ## TODO:
 #### Server:
 - [x] Setup HtmlResult
