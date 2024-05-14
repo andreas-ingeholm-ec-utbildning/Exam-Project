@@ -2,16 +2,12 @@
 
 namespace App.Models.ViewModels;
 
-public class EditUserViewModel(User user)
+public class EditUserViewModel
 {
-    [DataType(DataType.Password)]
-    [Display(Name = "Password")]
-    public string Password { get; set; } = null!;
-
     [Display(Name = "Display Name")]
-    public string DisplayName { get; set; } = user.DisplayName;
+    public string? DisplayName { get; set; }
 
-    public string ImageUrl { get; set; } = user.ImageUrl;
+    public string? ImageUrl { get; set; }
 
     [Display(Name = "Display Name")]
     [DataType(DataType.Upload)]

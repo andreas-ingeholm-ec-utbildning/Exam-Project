@@ -4,6 +4,8 @@
 //TODO: Test error
 //TODO: Add background image to error page
 //TODO: Change all root to view in all view partials
+//TODO: input[type="file"] cursor: pointer does not work on the text
+//TODO: Clean up controllers and put stuff into more services
 
 using App.Controllers;
 using App.DB;

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers;
 
-public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext) : HtmxController
+public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext, IWebHostEnvironment environment) : HtmxController
 {
     [HttpGet(Endpoints.User.Bookmarks)]
     public IActionResult Bookmarks()
@@ -35,29 +35,9 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         return GeneratedHtml();
     }
 
-    #region User
-
-    [HttpGet(Endpoints.User.Me)]
-    [HttpGet("/user")]
-    public async Task<IActionResult> Me()
-    {
-        if (!IsAuthenticated())
-            return Login();
-
-        var user = await userManager.FindByNameAsync(User.Identity!.Name!);
-        if (user is null)
-        {
-            await signInManager.SignOutAsync();
-            ModelState.AddModelError("", "Something went wrong, please try log in again.");
-            return Login();
-        }
-
-        return await UserVideos(user.UserName);
-    }
-
     [HttpGet("/{user:alpha}")]
     [HttpGet("/{user:alpha}/videos")]
-    public async Task<IActionResult> UserVideos(string? user, [FromQuery] int page = 0)
+    public async Task<IActionResult> UserVideos(string? user)
     {
         var entity = await userManager.FindByNameAsync(user ?? "");
         if (entity is null)
@@ -96,33 +76,6 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         return GeneratedHtml();
     }
 
-    [HttpGet(Endpoints.User.Edit)]
-    public async Task<IActionResult> Edit()
-    {
-        if (!IsAuthenticated())
-            return Login(redirectUrl: Endpoints.User.Upload);
-
-        var entity = await userManager.FindByNameAsync(User.Identity!.Name!);
-        if (entity is null)
-            return Error("No such user found.", "No such user found.");
-
-        var user = (User)entity;
-
-        SetTitle("Edit - Youtube clone");
-        SetBackground(Partials.Backgrounds.EditUser);
-        AddPartial(Partials.Views.EditUser, new EditUserViewModel(user));
-        return GeneratedHtml();
-    }
-
-    [HttpPost(Endpoints.User.Edit)]
-    public async Task<IActionResult> Edit(EditUserViewModel viewModel)
-    {
-
-        return Ok();
-
-    }
-
-    #endregion
     #region Login / Logout
 
     [HttpGet(Endpoints.User.Login)]
@@ -160,11 +113,101 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
     [HttpGet(Endpoints.User.Logout)] //User could navigate here manually
     public async Task<IActionResult> Logout()
     {
-        if (!IsHtmxRequest() || Request.Method != "POST")
+        if (!IsHtmxRequest())
             return RedirectToHome(string.Empty);
 
         await signInManager.SignOutAsync();
-        return feedController.Recommended();
+        return Redirect("/");
+    }
+
+    #endregion
+    #region Logged in user
+
+    [HttpGet(Endpoints.User.Me)]
+    [HttpGet("/user")]
+    public async Task<IActionResult> Me()
+    {
+        if (!IsAuthenticated())
+            return Login();
+
+        var user = await userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            await signInManager.SignOutAsync();
+            ModelState.AddModelError("", "Something went wrong, please try log in again.");
+            return Login();
+        }
+
+        return await UserVideos(user.UserName);
+    }
+
+    [HttpGet(Endpoints.User.Edit)]
+    public async Task<IActionResult> Edit()
+    {
+        if (!IsAuthenticated())
+            return Login(redirectUrl: Endpoints.User.Upload);
+
+        var entity = await userManager.FindByNameAsync(User.Identity!.Name!);
+        if (entity is null)
+            return Error("No such user found.", "No such user found.");
+
+        var user = (User)entity;
+
+        SetTitle("Edit - Youtube clone");
+        SetBackground(Partials.Backgrounds.EditUser);
+        AddPartial(Partials.Views.EditUser, new EditUserViewModel() { DisplayName = user.DisplayName, ImageUrl = user.ImageUrl });
+        return GeneratedHtml();
+    }
+
+    [HttpPost(Endpoints.User.Edit)]
+    public async Task<IActionResult> Edit(EditUserViewModel viewModel)
+    {
+        var isAuthenticated = IsAuthenticated();
+        var entity = await userManager.FindByNameAsync(User.Identity!.Name!);
+        var isChangingDisplayName = !string.IsNullOrEmpty(viewModel.DisplayName) && entity?.UserName != viewModel.DisplayName;
+        var isNameDuplicate = isChangingDisplayName && userManager.FindByNameAsync(viewModel.DisplayName!) is null;
+
+        if (!ModelState.IsValid || !isAuthenticated || entity is null || isNameDuplicate)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!isAuthenticated)
+                    ModelState.AddModelError("", "Could not authorize.");
+
+                if (entity is null)
+                    ModelState.AddModelError("", "Could not find user, please try again.");
+
+                if (isNameDuplicate)
+                    ModelState.AddModelError("", "The display name is already in use.");
+            }
+
+            SetTitle("Edit - Youtube clone");
+            SetBackground(Partials.Backgrounds.EditUser);
+            AddPartial(Partials.Views.EditUser, viewModel);
+            return GeneratedHtml();
+        }
+        else
+        {
+
+            if (isChangingDisplayName)
+                entity.UserName = viewModel.DisplayName;
+
+            if (viewModel.Image is not null)
+            {
+                var id = shortid.ShortId.Generate(new(useSpecialCharacters: false, length: 12));
+                var path = Path.Combine(environment.WebRootPath, "image", id + ".png");
+                Directory.GetParent(path)!.Create();
+                using var fs = new FileStream(path, FileMode.CreateNew);
+                await viewModel.Image.CopyToAsync(fs);
+                entity.ImageId = id;
+            }
+
+            await userManager.UpdateAsync(entity);
+            await dbContext.SaveChangesAsync();
+            await signInManager.RefreshSignInAsync(entity);
+
+            return await Me();
+        }
     }
 
     #endregion

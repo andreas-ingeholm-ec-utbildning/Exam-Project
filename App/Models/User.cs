@@ -12,6 +12,6 @@ public class User
         new()
         {
             DisplayName = entity.UserName!,
-            ImageUrl = $"/image/{entity.ImageId}"
+            ImageUrl = $"/image/{entity.ImageId}.png"
         };
 }
