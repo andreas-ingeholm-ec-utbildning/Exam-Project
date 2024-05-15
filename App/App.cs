@@ -23,6 +23,8 @@ builder.Services.AddTailwindCssTagHelpers(builder.Configuration);
 builder.Services.AddDbContext<DBContext>();
 builder.Services.AddTransient<EntityService<UserEntity>>();
 builder.Services.AddTransient<EntityService<VideoEntity>>();
+builder.Services.AddTransient<IMediaService, MediaService>();
+builder.Services.AddTransient<IIdService, IdService>();
 builder.Services.AddTransient<FeedController>();
 
 builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>().AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();

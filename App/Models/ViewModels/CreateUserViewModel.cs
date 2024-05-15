@@ -23,8 +23,5 @@ public class CreateUserViewModel
     [Display(Name = "Password")]
     public string Password { get; set; } = null!;
 
-    [Display(Name = "Display Name")]
-    public string? DisplayName { get; set; }
-
     public bool RememberMe { get; set; }
 }

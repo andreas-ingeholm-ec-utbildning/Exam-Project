@@ -5,19 +5,45 @@
 
     <form method="post" enctype="multipart/form-data" class="m-auto flex flex-col w-80">
 
-        <div class="col-auto rounded-full bg-gray-500 w-24 h-24 m-2 my-auto mt-3 mx-auto flex">
-            <img src="@Model?.ImageUrl" class="rounded-full m-auto">
+        <div class="col-auto rounded-full bg-neutral-800 hover:bg-neutral-700 w-24 h-24 m-auto cursor-pointer relative overflow-clip">
+            <div class="overflow-hidden flex">
+                <input asp-for=Image type="file" id="image-selector" placeholder="image..." accept="image/png" class="cursor-pointer p-[100%]">
+            </div>
+
+            <div class="flex pointer-events-none absolute left-0 top-0 right-0 bottom-0">
+                <img src="@Model?.ImageUrl" id="image-preview" class="rounded-full m-auto pointer-events-none p-1">
+            </div>
         </div>
 
-        <text class="mt-12 mb-2 text-white text-lg text-center">Image:</text>
-        <input asp-for=Image type="file" class="h-12 pt-2.5 text-opacity-0 text-center bg-neutral-800 rounded-xl flex-shrink flex-grow mb-1 min-w-0 text-white hover:bg-neutral-700 cursor-pointer file:hidden file:pointer-events-none">
-        
-        <text class="mt-4 mb-2 text-white text-lg text-center">Display name:</text>
-        <input asp-for=DisplayName type="text" placeholder="Display name..." class="h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 min-w-0 text-white mb-6">
+        <input asp-for=DisplayName type="text" placeholder="Display name..." class="mt-4 h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 min-w-0 text-white mb-6">
 
         <div asp-validation-summary="All" class="text-red-600 mt-5 mb-2 text-center whitespace-pre"></div>
         <button type="submit" class="mb-1 bg-neutral-800 hover:bg-neutral-600 rounded-xl h-16 flex transition-colors text-white">
             <text class="m-auto text-lg">Save</text>
         </button>
     </form>
+
+    <script>
+        document.getElementById('image-selector').addEventListener('change', (e) => {
+            readURL(e.target);
+        });
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var imagePreview = document.getElementById('image-preview');
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</div>
+
+<div class ="absolute right-0 bottom-0 m-2">
+    <a target="_blank" href="https://icons8.com/icon/23236/circled-user-female-skin-type-5">Circled User Female Skin Type 5</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 </div>

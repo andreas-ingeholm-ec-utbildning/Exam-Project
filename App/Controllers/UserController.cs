@@ -5,36 +5,11 @@ using App.Models.ViewModels;
 using App.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers;
 
-public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext, IWebHostEnvironment environment) : HtmxController
+public class UserController(FeedController feedController, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, DBContext dbContext, IWebHostEnvironment environment, IMediaService mediaService) : HtmxController
 {
-    [HttpGet(Endpoints.User.Bookmarks)]
-    public IActionResult Bookmarks()
-    {
-        if (!IsAuthenticated())
-            return Login(redirectUrl: Endpoints.User.Bookmarks);
-
-        SetTitle("Bookmarks - Youtube clone");
-        SetBackground(Partials.Backgrounds.Bookmark);
-        AddPartial(Partials.Views.Bookmarks);
-        return GeneratedHtml();
-    }
-
-    [HttpGet(Endpoints.User.Upload)]
-    public IActionResult Upload()
-    {
-        if (!IsAuthenticated())
-            return Login(redirectUrl: Endpoints.User.Upload);
-
-        SetTitle("Upload - Youtube clone");
-        SetBackground(Partials.Backgrounds.Upload);
-        AddPartial(Partials.Views.Upload);
-        return GeneratedHtml();
-    }
-
     [HttpGet("/{user:alpha}")]
     [HttpGet("/{user:alpha}/videos")]
     public async Task<IActionResult> UserVideos(string? user)
@@ -51,7 +26,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         WrapIn(Partials.Part.Feed);
 
         AddPartial(Partials.Part.UserPageHeader, (User)entity);
-        AddPartial(Partials.Part.TailwindContainer, "mt-44");
+        AddPartial(Partials.Part.TailwindContainer, "mt-52");
         AddPartials(Partials.Item.Video, Enumerable.Range(1, 50).Select(feedController.GetVideo).ToArray());
 
         return GeneratedHtml();
@@ -155,7 +130,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
 
         SetTitle("Edit - Youtube clone");
         SetBackground(Partials.Backgrounds.EditUser);
-        AddPartial(Partials.Views.EditUser, new EditUserViewModel() { DisplayName = user.DisplayName, ImageUrl = user.ImageUrl });
+        AddPartial(Partials.Views.EditUser, new EditUserViewModel() { DisplayName = user.DisplayName == entity.Email ? string.Empty : user.DisplayName, ImageUrl = user.ImageUrl });
         return GeneratedHtml();
     }
 
@@ -188,17 +163,12 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         }
         else
         {
-
             if (isChangingDisplayName)
                 entity.UserName = viewModel.DisplayName;
 
             if (viewModel.Image is not null)
             {
-                var id = shortid.ShortId.Generate(new(useSpecialCharacters: false, length: 12));
-                var path = Path.Combine(environment.WebRootPath, "image", id + ".png");
-                Directory.GetParent(path)!.Create();
-                using var fs = new FileStream(path, FileMode.CreateNew);
-                await viewModel.Image.CopyToAsync(fs);
+                var id = await mediaService.Upload(viewModel.Image, MediaKind.Image);
                 entity.ImageId = id;
             }
 
@@ -208,6 +178,30 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
 
             return await Me();
         }
+    }
+
+    [HttpGet(Endpoints.User.Bookmarks)]
+    public IActionResult Bookmarks()
+    {
+        if (!IsAuthenticated())
+            return Login(redirectUrl: Endpoints.User.Bookmarks);
+
+        SetTitle("Bookmarks - Youtube clone");
+        SetBackground(Partials.Backgrounds.Bookmark);
+        AddPartial(Partials.Views.Bookmarks);
+        return GeneratedHtml();
+    }
+
+    [HttpGet(Endpoints.User.Upload)]
+    public IActionResult Upload()
+    {
+        if (!IsAuthenticated())
+            return Login(redirectUrl: Endpoints.User.Upload);
+
+        SetTitle("Upload - Youtube clone");
+        SetBackground(Partials.Backgrounds.Upload);
+        AddPartial(Partials.Views.Upload);
+        return GeneratedHtml();
     }
 
     #endregion
@@ -228,19 +222,13 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         if (await userManager.FindByEmailAsync(viewModel.EmailAddress) is not null)
             ModelState.AddModelError("", "Email address already in use.");
 
-        if (string.IsNullOrEmpty(viewModel.DisplayName))
-            ModelState.AddModelError("", "Display name cannot be empty.");
-
-        if (await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.DisplayName) is not null)
-            ModelState.AddModelError("", "Display name already in use.");
-
         SetTitle("Create user - Youtube clone");
         SetBackground(Partials.Backgrounds.CreateUser);
 
         if (!ModelState.IsValid)
             return AddPartial(Partials.Views.CreateUser, viewModel).GeneratedHtml();
 
-        var entity = new UserEntity() { Email = viewModel.EmailAddress, UserName = viewModel.DisplayName! };
+        var entity = new UserEntity() { Email = viewModel.EmailAddress, UserName = viewModel.EmailAddress!, ImageId = "default-avatar" };
 
         var result = await userManager.CreateAsync(entity, viewModel.Password);
         if (!result.Succeeded)
@@ -254,9 +242,7 @@ public class UserController(FeedController feedController, SignInManager<UserEnt
         await dbContext.SaveChangesAsync();
         await signInManager.PasswordSignInAsync(entity, viewModel.Password, viewModel.RememberMe, false);
 
-        AddPartial(Partials.Views.User, (User)entity);
-
-        return GeneratedHtml();
+        return Redirect(Endpoints.User.Edit);
     }
 
     #endregion

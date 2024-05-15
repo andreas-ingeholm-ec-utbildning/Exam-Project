@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -111,8 +110,6 @@ public class HtmlResult(HtmxController controller) : ContentResult, IHtmlResult
             controller.Error("An error occured", ex.Message);
             html = await RenderPartials();
         }
-
-        html = html.RemoveWhitespace();
 
         using var sw = new StreamWriter(response.Body, Encoding.UTF8);
         await sw.WriteAsync(html);

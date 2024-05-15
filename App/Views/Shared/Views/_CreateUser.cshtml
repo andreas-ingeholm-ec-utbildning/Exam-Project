@@ -3,7 +3,7 @@
 <div class="flex flex-col">
     <text class="text-center text-white text-5xl my-10">Create</text>
 
-    <form method="post" class="m-auto flex flex-col w-80">
+    <form method="post" enctype="multipart/form-data" class="m-auto flex flex-col w-80">
         <input asp-for=EmailAddress type="text" placeholder="Email address..." class="h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 my-2 min-w-0 text-white">
         <input asp-for=Password     type="password" placeholder="Password..."  class="h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 my-2 min-w-0 text-white">
 
@@ -13,14 +13,11 @@
             <p class="h-0">123456Aa!</p>
         }
 
-        <div class="flex-col self-end me-2">
+        <div class="flex-col self-end me-2 mb-12">
             <label asp-for="RememberMe" class="text-white ms-auto me-2">Remember me</label>
             <input asp-for="RememberMe" type="checkbox" />
         </div>
 
-        <input asp-for=DisplayName  type="text"  placeholder="Display name..." class="h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 mt-12 mb-1 min-w-0 text-white">
-        <text class="text-gray-500 ms-1">* Can be changed later</text>
-       
         <div asp-validation-summary="All" class="text-red-600 mt-5 mb-2 text-center whitespace-pre"></div>
         <button type="submit" class="mb-1 bg-neutral-800 hover:bg-neutral-600 rounded-xl h-16 flex transition-colors text-white">
             <text class="m-auto text-lg">Create account</text>
