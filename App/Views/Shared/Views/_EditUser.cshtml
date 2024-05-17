@@ -1,6 +1,13 @@
 ﻿@model EditUserViewModel
 
 <div class="flex flex-col">
+    <div class="absolute">
+        <button hx-get="@Endpoints.User.Me" class="cursor-pointer text-gray-300 hover:text-gray-400 transition-colors m-2 ms-4">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back
+        </button>
+    </div>
+
     <text class="text-center text-white text-5xl my-10">Edit</text>
 
     <form method="post" enctype="multipart/form-data" class="m-auto flex flex-col w-80">
@@ -13,11 +20,15 @@
             <div class="flex pointer-events-none absolute left-0 top-0 right-0 bottom-0">
                 <img src="@Model?.ImageUrl" id="image-preview" class="rounded-full m-auto pointer-events-none p-1">
             </div>
+
+            <div class="flex pointer-events-none absolute left-0 top-0 right-0 bottom-0">
+                <i class="fa-solid fa-pen m-auto text-white text-outline"></i>
+            </div>
         </div>
 
-        <input asp-for=DisplayName type="text" placeholder="Display name..." class="mt-4 h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 min-w-0 text-white mb-6">
+        <input asp-for=DisplayName type="text" placeholder="Display name..." class="mt-4 h-12 bg-neutral-800 rounded-xl focus:outline-none flex-shrink flex-grow ps-3 min-w-0 text-white">
 
-        <div asp-validation-summary="All" class="text-red-600 mt-5 mb-2 text-center whitespace-pre"></div>
+        <div asp-validation-summary="All" class="text-red-600 mb-2 text-center whitespace-pre"></div>
         <button type="submit" class="mb-1 bg-neutral-800 hover:bg-neutral-600 rounded-xl h-16 flex transition-colors text-white">
             <text class="m-auto text-lg">Save</text>
         </button>
